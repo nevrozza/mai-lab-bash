@@ -1,6 +1,12 @@
+import pathlib
 import readline
 
+from colorama import init, Fore
+
+from src.terminal.autocomplete import Autocomplete
 from src.terminal.command import BashCommand
+from src.terminal.fs import FS
+from src.utils.errors import BashSyntaxError
 
 
 # https://docs-python.ru/standart-library/modul-readline-python/
@@ -8,78 +14,47 @@ class Terminal:
     def __init__(self):
         # Импоритруем команды
         BashCommand.import_all_commands()
+        # Enable autocomplete
+        Autocomplete.enable()
 
-        # Регистрация `Tab` для автокомплита
-        readline.parse_and_bind('tab: complete')
-        readline.parse_and_bind('bind ^I rl_complete')  # MacOS...
-        readline.set_completer(self._autocompleter)
-        readline.set_completer_delims(' ')  # По умолчанию там есть другие знаки (!~*...) из-за чего
+    def cycle_input(self):
+        init()  # Colorama
+        FS.cd("~/Desktop")  # Start from ~/Desktop
 
-        # В Ubuntu (или в терминале MacOS) в ситуации где у нас есть 2 файла в директории [p1, p2],
-        # и мы вводим команду (например catman), но с автокомплитом:
-        # 'catma' -> 'catman ' -> 'catman p' -> 'catman p'+подсказки
-        # Т.е. Подсказки выводятся после второго таба,
-        # но что важно: отсчёт табов начинается после `развилки`
-        #
-        # В текущей реализации программы это не так, а вот так:
-        # 'catma' -> 'catman ' -> 'catman p'+подсказки
-        # Причём: 'catman ' -> 'catman p' -> 'catman p'+подсказки (нет единообразия((
-        # Т.е. отсчёт табов введёт себя по-другому(
-        #
-        # Можно было бы написать свою реализацию вывода подсказок, но, к сожалению,
-        # Из-за особенностей MacOS функция, которая позволяет это сделать, игнорится =)))
-        # https://github.com/oils-for-unix/oils/pull/235
-        # readline.set_completion_display_matches_hook()
+        print("=== Double `Tab` to show all commands ===")
+        while True:
+            input_line = input(
+                f"{Fore.LIGHTGREEN_EX}meow@user{Fore.RESET}:{Fore.LIGHTBLUE_EX}{FS.cwd_str()}{Fore.RESET}$ "
+            )
+            commands = self._parse_commands(input_line)
+            self._execute_commands(commands)
 
-        self._current_suggestions = []
+    @staticmethod
+    def _execute_commands(commands: list[BashCommand]):
+        for command in commands:
+            command.execute()
 
-    def _autocompleter(self, _: str, state: int) -> str | None:
-        """
-        !!! Используется для `readline.set_completer` !!!
+    @classmethod
+    def _parse_commands(cls, input_line: str) -> list[BashCommand]:
+        commands: list[BashCommand] = []
+        try:
+            parametrized_commands = [cls._get_command_params(command) for command in input_line.split(";") if
+                                     command.strip()]
+            for name, etc in parametrized_commands:
+                try:
+                    commands.append(BashCommand.get_all_commands()[name](etc))
+                except KeyError:
+                    print(f"'{name}' command not found")
+        except BashSyntaxError:
+            print(f"syntax error!")
+        return commands
 
-        :param _: Был text, но безопаснее использовать `readline.get_line_buffer()`
-        :param state: Итерация прохода по suggestions
-        :return: Одно из предложений или None
-        """
-
-        # Эта функция вызывается после нажатия `Tab` до тех пор, пока не получит None
-        # Иначе происходит инкремент state
-        # Поэтому делаем проверку state == 0
-        if not state:
-            input_line = readline.get_line_buffer()
-
-            # В bash ведущие пробелы не роляют
-            leading_spaces = len(input_line) - len(input_line.lstrip())
-            input_line = input_line.lstrip()
-
-            begin = readline.get_begidx() - leading_spaces
-            end = readline.get_endidx() - leading_spaces
-
-            # Текст, который мы сейчас дополняем
-            being_completed = input_line[begin:end]
-
-            if not input_line:
-                # Пустая строка -> показываем все команды
-                self._current_suggestions = list(BashCommand.get_all_commands().keys())
-            elif begin == 0:
-                # Первое слово -> дополняем команды
-                suggestions = [cmd for cmd in BashCommand.get_all_commands()
-                               if cmd.startswith(being_completed)]
-                if len(suggestions) == 1:
-                    # Разветвление необходимо, чтобы добавить пробел к полностью введённому слову
-                    self._current_suggestions = [suggestions[0] + " "]
-                else:
-                    self._current_suggestions = suggestions
-
-            else:
-                # Обработка остальных параметров (следующие слова после первого!)
-                dir_content = ["p1 ", "p2 ", "xx "]
-                if being_completed:  # Если мы начали писать имя файла/директории
-                    self._current_suggestions = [d for d in dir_content if d.startswith(being_completed)]
-                else:
-                    self._current_suggestions = dir_content
-
-        if state < len(self._current_suggestions):
-            return self._current_suggestions[state]
-        else:
-            return None
+    @staticmethod
+    def _get_command_params(command: str) -> tuple[str, list[str]]:
+        try:
+            params = command.split()
+            name = params[0]
+            etc = params[1:]
+            return name, etc
+        except IndexError:
+            raise BashSyntaxError

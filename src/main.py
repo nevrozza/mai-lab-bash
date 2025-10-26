@@ -8,10 +8,7 @@ def main() -> None:
     :return: Данная функция ничего не возвращает
     """
     terminal = Terminal()
-    print("Double `Tab` for show all commands")
-    while True:
-        input(">")
-
+    terminal.cycle_input()
 
 if __name__ == "__main__":
     main()
