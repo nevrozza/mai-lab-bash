@@ -1,11 +1,16 @@
+import pathlib
 import readline
 
+from colorama import init, Fore
+
 from src.terminal.command import BashCommand
+from src.terminal.file_system import FileSystem
 
 
 # https://docs-python.ru/standart-library/modul-readline-python/
 class Terminal:
     def __init__(self):
+        self._file_system = FileSystem()
         # Импоритруем команды
         BashCommand.import_all_commands()
 
@@ -30,8 +35,23 @@ class Terminal:
         # Из-за особенностей MacOS функция, которая позволяет это сделать, игнорится =)))
         # https://github.com/oils-for-unix/oils/pull/235
         # readline.set_completion_display_matches_hook()
+        #
+        # Double `Tab` workaround
+        # readline.get_completion_type() -> 63 # ord("?") if doubleTab
+        # readline.get_completion_type() -> 9 # ord("\t") if singleTab
+        # print(readline.get_completion_type())
 
         self._current_suggestions = []
+        self._prev_completed_word = ''
+
+    def cycle_input(self):
+        init()
+        self._file_system.cd(pathlib.Path.home())
+        print("=== Double `Tab` to show all commands ===")
+        while True:
+            input(
+                f"{Fore.LIGHTGREEN_EX}meow@user{Fore.RESET}:{Fore.LIGHTBLUE_EX}{self._file_system.cwd_str()}{Fore.RESET}$ "
+            )
 
     def _autocompleter(self, _: str, state: int) -> str | None:
         """
@@ -73,7 +93,7 @@ class Terminal:
 
             else:
                 # Обработка остальных параметров (следующие слова после первого!)
-                dir_content = ["p1 ", "p2 ", "xx "]
+                dir_content = ["p1 ", "p2 "]  # , "xx "
                 if being_completed:  # Если мы начали писать имя файла/директории
                     self._current_suggestions = [d for d in dir_content if d.startswith(being_completed)]
                 else:
