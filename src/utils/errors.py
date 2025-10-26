@@ -1,0 +1,2 @@
+class BashError(Exception):
+    pass

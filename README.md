@@ -4,7 +4,7 @@
 > Запускать в терминале, иначе autocomplete не будет работать =(
 
 
-Terminal:
+mb fix: Команды и autocomplete типа ls;ca -> ls;cat не работает!
 
 TODO:
 
@@ -12,7 +12,7 @@ Terminal:
 - io с авто-комплитом +вызов функций
 - логгирование
 
-Command(ABC)
+BashCommand(ABC)
 - ls # -l
 - cd # .. #~
 - cat 
