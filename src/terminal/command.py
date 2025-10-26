@@ -8,6 +8,9 @@ from src.utils.immutable_dict import ImmutableDict
 class BashCommand(ABC):
     _all_commands: dict[str, 'BashCommand'] = {}
 
+    def __init__(self, line: str):
+        print(self, line)
+
     @classmethod
     def get_all_commands(cls) -> ImmutableDict[str, 'BashCommand']:
         return ImmutableDict(cls._all_commands)
@@ -19,6 +22,7 @@ class BashCommand(ABC):
 
     @classmethod
     def import_all_commands(cls):
+
         if cls._all_commands:
             return
 

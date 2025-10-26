@@ -46,7 +46,7 @@ class Terminal:
 
     def cycle_input(self):
         init()
-        self._file_system.cd(pathlib.Path.home())
+        self._file_system.cd("~/Desktop")
         print("=== Double `Tab` to show all commands ===")
         while True:
             input(
