@@ -3,6 +3,8 @@ import pathlib
 import stat
 from functools import wraps
 
+from src.utils.quoting_type import QuotingType
+
 
 class FS:
     from_tilda = False
@@ -59,10 +61,14 @@ class FS:
             return False
 
     @classmethod
-    def normalize_name(cls, name: str) -> str:
+    def normalize_name(cls, name: str, quoting_type: QuotingType = QuotingType.SINGLE_QUOTE) -> str:
         parts = name.split()
         if len(parts) > 1:
-            return f"'{name}'"
+            if quoting_type != QuotingType.ESCAPING_TYPE:
+                quote = quoting_type.value
+                return f"{quote}{name}{quote}"
+            else:  # QuotingType.ESCAPING_TYPE
+                return "\\ ".join(parts) + "/"
         else:
             return name
 
