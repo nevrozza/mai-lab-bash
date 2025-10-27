@@ -1,6 +1,7 @@
 import readline
 
 from src.terminal.command import BashCommand
+from src.terminal.fs import FS
 
 
 class Autocomplete:
@@ -36,7 +37,7 @@ class Autocomplete:
         cls._current_suggestions = []
 
     @classmethod
-    def _autocompleter(cls, _: str, state: int) -> str | None:
+    def _autocompleter(cls, text: str, state: int) -> str | None:
         """
         !!! Используется для `readline.set_completer` !!!
 
@@ -76,7 +77,7 @@ class Autocomplete:
 
             else:
                 # Обработка остальных параметров (следующие слова после первого!)
-                dir_content = ["p1 ", "p2 "]  # , "xx "
+                dir_content = [FS.normalize_name(p.name) for p in FS.ls("") if not FS.is_hidden(p)]
                 if being_completed:  # Если мы начали писать имя файла/директории
                     cls._current_suggestions = [d for d in dir_content if d.startswith(being_completed)]
                 else:
