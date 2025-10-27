@@ -1,5 +1,6 @@
 import pathlib
 import readline
+import shlex
 
 from colorama import init, Fore
 
@@ -38,11 +39,12 @@ class Terminal:
     def _parse_commands(cls, input_line: str) -> list[BashCommand]:
         commands: list[BashCommand] = []
         try:
-            parametrized_commands = [cls._get_command_params(command) for command in input_line.split(";") if
-                                     command.strip()]
-            for name, etc in parametrized_commands:
+            raw_parametrized_commands = [cls._get_command_raw_params(command) for command in input_line.split(";") if
+                                         command.strip()]
+            for name, raw_params in raw_parametrized_commands:
                 try:
-                    commands.append(BashCommand.get_all_commands()[name](etc))
+                    command = BashCommand.get_command(name)
+                    commands.append(command(raw_params))
                 except KeyError:
                     print(f"'{name}' command not found")
         except BashSyntaxError:
@@ -50,9 +52,9 @@ class Terminal:
         return commands
 
     @staticmethod
-    def _get_command_params(command: str) -> tuple[str, list[str]]:
+    def _get_command_raw_params(command: str) -> tuple[str, list[str]]:
         try:
-            params = command.split()
+            params = shlex.split(command)
             name = params[0]
             etc = params[1:]
             return name, etc
