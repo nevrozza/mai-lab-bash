@@ -1,9 +1,13 @@
 from collections.abc import Mapping
+from typing import TypeVar
+
+KT = TypeVar('KT')  # Key
+VT = TypeVar('VT')  # Value
 
 
 # https://docs.python.org/3/library/collections.abc.html
-class ImmutableDict(Mapping):
-    def __init__(self, content: dict):
+class ImmutableDict(Mapping[KT, VT]):
+    def __init__(self, content: dict[KT, VT]):
         self._content = content
 
     def keys(self):
