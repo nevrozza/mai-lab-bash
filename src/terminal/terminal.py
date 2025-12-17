@@ -1,12 +1,10 @@
-import pathlib
-import readline
 import shlex
 
 from colorama import init, Fore
 
 from src.terminal.autocomplete import Autocomplete
 from src.terminal.command import BashCommand
-from src.terminal.fs import FS
+from src.terminal.file_system.fs import fs
 from src.utils.errors import BashSyntaxError
 
 
@@ -20,12 +18,12 @@ class Terminal:
 
     def cycle_input(self):
         init()  # Colorama
-        FS.cd("~/Desktop")  # Start from ~/Desktop
+        fs.cd("~/Desktop")  # Start from ~/Desktop
 
         print("=== Double `Tab` to show all commands ===")
         while True:
             input_line = input(
-                f"{Fore.LIGHTGREEN_EX}meow@user{Fore.RESET}:{Fore.LIGHTBLUE_EX}{FS.cwd_str()}{Fore.RESET}$ "
+                f"{Fore.LIGHTGREEN_EX}meow@user{Fore.RESET}:{Fore.LIGHTBLUE_EX}{fs.cwd_str()}{Fore.RESET}$ "
             )
             commands = self._parse_commands(input_line)
             self._execute_commands(commands)
