@@ -2,7 +2,8 @@ import pathlib
 
 from src.terminal.command import BashCommand
 from src.terminal.file_system.fs import fs
-from src.terminal.file_system.resolve_path import resolve_path, resolve_path_deco
+from src.terminal.file_system.resolve_path import resolve_path_deco
+from src.utils.files_grid_print import files_grid_print
 
 
 class LSBashCommand(BashCommand):
@@ -19,11 +20,14 @@ class LSBashCommand(BashCommand):
 
     @resolve_path_deco
     def _print_items(self, path: pathlib.Path):
-        is_dir = fs.properties.is_dir(path)
-        content = fs.ls(path) if is_dir else [path]
         show_hidden = 'a' in self._flags
         detailed = 'l' in self._flags
-        print(content)
+        is_dir = fs.properties.is_dir(path)
+        content = list(filter(lambda p: show_hidden or not fs.properties.is_hidden(p), fs.ls(path) if is_dir else [path]))
+        if detailed:
+            ...
+        else:
+            files_grid_print(content)
 
     def _validate_params(self):
         if not self._params:
