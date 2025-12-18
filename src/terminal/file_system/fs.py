@@ -30,7 +30,7 @@ class FS:
         return cwd
 
     @staticmethod
-    def normalize_name(name: str, quoting_type: QuotingType = QuotingType.SINGLE_QUOTE,
+    def normalize_name(name: str, quoting_type: QuotingType = QuotingType.ESCAPING_TYPE,
                        path: pathlib.Path | None = None) -> str:
         parts = name.split()
 
