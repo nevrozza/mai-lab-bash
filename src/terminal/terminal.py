@@ -2,17 +2,19 @@ import shlex
 
 from colorama import init, Fore
 
+from src.commands.import_default_commands import import_default_commands
 from src.terminal.autocomplete import Autocomplete
 from src.terminal.command import BashCommand
 from src.terminal.file_system.fs import fs
+from src.utils.config import BashConfig
 from src.utils.errors import BashSyntaxError
 
 
 # https://docs-python.ru/standart-library/modul-readline-python/
 class Terminal:
     def __init__(self):
-        # Импоритруем команды
-        BashCommand.import_all_commands()
+        # Импоритруем дефолтные команды (если в конфиге они включены)
+        BashConfig.enable_default_commands and import_default_commands()
         # Enable autocomplete
         Autocomplete.enable()
 
