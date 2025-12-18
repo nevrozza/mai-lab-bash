@@ -5,6 +5,8 @@
 playground.py
 playground2.py
 
+uv.lock
+
 # User-specific stuff
 .idea/
 .idea/**/workspace.xml

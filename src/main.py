@@ -1,4 +1,5 @@
 from src.terminal.command import BashCommand
+from src.terminal.file_system.fs import fs
 from src.terminal.terminal import Terminal
 
 
@@ -9,6 +10,7 @@ def main() -> None:
     """
     terminal = Terminal()
     terminal.cycle_input()
+
 
 if __name__ == "__main__":
     main()

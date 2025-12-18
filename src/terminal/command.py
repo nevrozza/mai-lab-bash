@@ -8,7 +8,7 @@ from src.utils.immutable_dict import ImmutableDict
 
 
 class BashCommand(ABC):
-    _all_commands: dict[str, 'BashCommand'] = {}
+    _all_commands: dict[str, BashCommand] = {}
 
     @property
     @abstractmethod
@@ -59,14 +59,14 @@ class BashCommand(ABC):
         return flags, params
 
     @classmethod
-    def get_all_commands(cls) -> ImmutableDict[str, 'BashCommand']:
+    def get_all_commands(cls) -> ImmutableDict[str, BashCommand]:
         return ImmutableDict(cls._all_commands)
 
     @classmethod
     def get_command(cls, key: str):
         return cls._all_commands[key]
 
-    def __init_subclass__(cls: 'BashCommand', **kwargs):
+    def __init_subclass__(cls: BashCommand, **kwargs):
         """Добавляем команды в словарь для автокомплита и вызова команд"""
         # LSBashCommand -> ls
         cls._all_commands[cls.__name__.removesuffix("BashCommand").lower()] = cls
