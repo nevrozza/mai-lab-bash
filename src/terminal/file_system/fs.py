@@ -21,11 +21,7 @@ class FS:
 
     @resolve_path_deco
     def ls(self, path) -> list[pathlib.Path]:
-        try:
-            path = resolve_path(path)
-            return list(path.iterdir())
-        except Exception as t:
-            print(t)
+        return list(path.iterdir())
 
     def cwd_str(self) -> str:
         cwd = str(pathlib.Path.cwd())

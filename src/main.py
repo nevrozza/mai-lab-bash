@@ -1,5 +1,3 @@
-from src.terminal.command import BashCommand
-from src.terminal.file_system.fs import fs
 from src.terminal.terminal import Terminal
 
 

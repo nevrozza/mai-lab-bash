@@ -140,7 +140,6 @@ class Autocomplete:
             else:
                 # Предлагаем содержимое директории
                 cls._current_suggestions = cls._get_relevant_dir_content(
-                    line=line,
                     being_completed=being_completed,
                     completion_scope=completion_scope,
                     quoting_type=quoting_type
@@ -161,10 +160,10 @@ class Autocomplete:
             return None
 
     @classmethod
-    def _get_relevant_dir_content(cls, line: str, being_completed: str, completion_scope: str,
+    def _get_relevant_dir_content(cls, being_completed: str, completion_scope: str,
                                   quoting_type: QuotingType):
-        dir_content = cls._get_current_dir_content(completion_scope=completion_scope,
-                                                   being_completed=being_completed, quoting_type=quoting_type)
+        dir_content = cls._get_current_dir_content(
+            being_completed=being_completed, quoting_type=quoting_type)
 
         if being_completed:
             return [
@@ -175,8 +174,9 @@ class Autocomplete:
             return dir_content
 
     @classmethod
-    def _get_current_dir_content(cls, completion_scope: str, being_completed: str,
+    def _get_current_dir_content(cls, being_completed: str,
                                  quoting_type: QuotingType) -> list[str]:
+
         # print(completion_scope)
         if being_completed and (maybe_dir := shlex.split(being_completed)[-1]) and fs.properties.is_dir(maybe_dir):
             parent = being_completed.split("/")[0:-1]
@@ -188,7 +188,7 @@ class Autocomplete:
             directory = ""
         files = fs.ls(directory)
         result = [(cls.cur_dir + fs.normalize_name(p.name, quoting_type=quoting_type, path=p)) for p in
-                  files if not fs.properties.is_hidden(p)]
+                  files if not fs.properties.is_hidden(path=p)]
         # print
         return result
 
