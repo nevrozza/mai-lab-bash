@@ -9,6 +9,11 @@ from src.utils.immutable_dict import ImmutableDict
 class BashCommand(ABC):
     _all_commands: dict[str, BashCommand] = {}
 
+    def __init__(self, raw_params: list[str]):
+        self._raw_params = raw_params
+        self._flags: set[str] = set()
+        self._params: list[str] = []
+
     @classmethod
     def _name(cls) -> str:
         # override for custom naming
@@ -35,11 +40,6 @@ class BashCommand(ABC):
         self._flags, self._params = self._parse_raw_params(self._raw_params)
         return self._validate_params(), self._exec()
 
-    def __init__(self, raw_params: list[str]):
-        self._raw_params = raw_params
-        self._flags: set[str] = set()
-        self._params: list[str] = []
-
     def _parse_raw_params(self, raw_params: list[str]) -> tuple[set[str], list[str]]:
         flags: set[str] = set()
         params = []
@@ -54,10 +54,11 @@ class BashCommand(ABC):
                     else:
                         flags.add(f)
             else:
-                if not self._max_params_count or len(params) <= self._max_params_count:
+                #                           +1 cuz we haven't append new parameter yet
+                if (not self._max_params_count) or (len(params) + 1) <= self._max_params_count:
                     params.append(par)
                 else:
-                    raise BashMoreParamsThenExpectedError
+                    raise BashMoreParamsThenExpectedError(self._name())
         return flags, params
 
     @classmethod
