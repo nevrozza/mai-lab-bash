@@ -7,10 +7,6 @@ class BashSyntaxError(BashError):
         super().__init__("syntax error!")
 
 
-class BashInvalidFlagError(BashError):  # Invalid option
-    pass
-
-
 class BashNoSupportForLongFlagsError(BashError):
     pass
 
@@ -18,6 +14,12 @@ class BashNoSupportForLongFlagsError(BashError):
 class BashCommandError(BashError):
     def __init__(self, name: str, msg: str):
         super().__init__(f"{name}: {msg}")
+
+
+class BashInvalidFlagError(BashCommandError):  # Invalid option
+    def __init__(self, name: str, flag: str, supported: str):
+        super().__init__(name=name,
+                         msg=f"-{flag}: invalid option" + (f" (supported: -{" -".join(supported)})" if supported else ""))
 
 
 class BashMissingDestinationFileOperandError(BashCommandError):

@@ -8,9 +8,8 @@ class CDBashCommand(BashCommand):
     def _max_params_count(self) -> int:
         return 1
 
-    def _exec(self) -> str:
+    def _exec(self) -> str | None:
         len(self._params) == 1 and fs.cd(self._params[0])
-        return ""
 
     def _validate_params(self) -> list[BashError]:
         # Здесь все ошибки являются критическими, поэтому raise
@@ -20,7 +19,7 @@ class CDBashCommand(BashCommand):
 
         # We know: there is only one parameter
         path = self._params[0]
-        command_name = self._name()
+        command_name = self.name()
         if not fs.properties.existing_path(path):
             raise BashNoSuchFileOrDirectoryError(name=command_name, filename=path)
         elif not fs.properties.is_dir(path):

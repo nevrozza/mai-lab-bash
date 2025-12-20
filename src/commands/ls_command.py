@@ -58,7 +58,7 @@ class LSBashCommand(BashCommand):
         def validate_path(path: str):
             if not fs.properties.existing_path(path):
                 self._params.remove(path)
-                return BashNoSuchFileOrDirectoryError(name=self._name(),
+                return BashNoSuchFileOrDirectoryError(name=self.name(),
                                                       filename=path)
             return None
 

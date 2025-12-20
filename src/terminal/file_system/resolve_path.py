@@ -32,7 +32,9 @@ def resolve_path_deco(func):
 
 
 # Not in FS because of using in FS and FSProperties
-def resolve_path(path: str | pathlib.Path) -> pathlib.Path:
-    # forced space escaping for tab-tab-tab folder completion (workaround)
-    a = pathlib.Path(path.replace(r"\ ", " ")).expanduser().resolve() if isinstance(path, str) else path
+def resolve_path(path: str | pathlib.Path, wd: str | pathlib.Path | None = None) -> pathlib.Path:
+    a = pathlib.Path(
+        ((str(wd) + "/") if (wd and not path.startswith(("~", "/"))) else "") +  # support custom wd
+        # forced space escaping for tab-tab-tab folder completion (workaround)
+        path.replace(r"\ ", " ")).expanduser().resolve() if isinstance(path, str) else path
     return a

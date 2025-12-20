@@ -1,5 +1,6 @@
 import os
 import pathlib
+from shutil import rmtree
 
 from src.terminal.file_system.fs_properties import FSProperties
 from src.terminal.file_system.resolve_path import resolve_path, resolve_path_deco
@@ -14,6 +15,13 @@ class FS:
     def __init__(self, properties: FSProperties):
         self.from_tilda = False
         self.properties = properties
+
+    @resolve_path_deco
+    def rm(self, path: pathlib.Path):
+        if self.properties.is_dir(path):
+            rmtree(path, ignore_errors=True)
+        else:
+            os.remove(path)
 
     def cd(self, path_str: str):
         if path_str and path_str[0] in ("~", "/"):
