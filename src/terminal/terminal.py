@@ -51,7 +51,8 @@ class Terminal:
                 log(output)
                 is_error = True
             finally:
-                HistoryManager.add_command(command_line=command.command_line, is_error=is_error, wd=cwd)
+                HistoryManager.add_command(command_name=command.name(), command_line=command.command_line,
+                                           is_error=is_error, wd=cwd)
 
     @classmethod
     def _parse_commands(cls, input_line: str) -> list[BashCommand]:
@@ -65,7 +66,7 @@ class Terminal:
                         bash_command = BashCommand.get_command(name)
                         commands.append(bash_command(raw_params, command_line))
                     except KeyError:
-                        HistoryManager.add_command(command_line, is_error=True, wd=cwd)
+                        HistoryManager.add_command(command_name=name, command_line=command_line, is_error=True, wd=cwd)
                         log(f"'{name}' command not found")
         except BashSyntaxError as e:
             log(e)

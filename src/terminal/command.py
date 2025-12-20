@@ -18,7 +18,7 @@ class BashCommand(ABC):
         self.command_line = command_line
 
     @classmethod
-    def _name(cls) -> str:
+    def name(cls) -> str:
         # override for custom naming
         return cls.__name__.removesuffix("BashCommand").lower()
 
@@ -52,7 +52,7 @@ class BashCommand(ABC):
                 for f in par[1:]:
                     if f not in self._supported_flags:
                         if not BashConfig.IGNORE_EXTRA_FLAGS:
-                            raise BashInvalidFlagError(name=self._name(), flag=f, supported=self._supported_flags)
+                            raise BashInvalidFlagError(name=self.name(), flag=f, supported=self._supported_flags)
                     else:
                         flags.add(f)
             else:
@@ -60,7 +60,7 @@ class BashCommand(ABC):
                 if (not self._max_params_count) or (len(params) + 1) <= self._max_params_count:
                     params.append(par)
                 else:
-                    raise BashMoreParamsThenExpectedError(self._name())
+                    raise BashMoreParamsThenExpectedError(self.name())
         return flags, params
 
     @classmethod
@@ -75,11 +75,11 @@ class BashCommand(ABC):
         """Добавляем команды в словарь для автокомплита и вызова команд"""
 
         if not inspect.isabstract(cls):
-            cls._all_commands[cls._name()] = cls
+            cls._all_commands[cls.name()] = cls
 
 
 class UndoableBashCommand(BashCommand, ABC):
-    undoable_commands: list = {}
+    undoable_commands: set[str] = {}
 
     @abstractmethod
     def undo(self, history_line: HistoryLine):
@@ -89,4 +89,4 @@ class UndoableBashCommand(BashCommand, ABC):
         """Добавляем команды в словарь для автокомплита и вызова команд"""
         super().__init_subclass__(**kwargs)
         if not inspect.isabstract(cls):
-            cls.undoable_commands.append(cls._name())  # для поискаhgi undo
+            cls.undoable_commands.add(cls.name())  # для поискаhgi undo

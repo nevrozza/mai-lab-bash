@@ -18,6 +18,7 @@ class HistoryLineStatus(Enum):
 @dataclass(frozen=True)
 class HistoryLine:
     num: int
+    command_name: str
     command_line: str
     status: HistoryLineStatus
     wd: str
@@ -50,6 +51,7 @@ class HistoryManager:
                 cls.history = [
                     HistoryLine(
                         num=item['num'],
+                        command_name=item["name"],
                         command_line=item['command'],
                         status=HistoryLineStatus(item['status']),
                         wd=item['wd']
@@ -69,6 +71,7 @@ class HistoryManager:
             data = [
                 {
                     'num': line.num,
+                    'name': line.command_line,
                     'command': line.command_line,
                     'status': line.status.value,
                     'wd': line.wd
@@ -82,12 +85,13 @@ class HistoryManager:
             log(BashError(f"failed to save history to {cls._history_path}: {e}"))
 
     @classmethod
-    def add_command(cls, command_line: str, is_error: bool, wd: str):
+    def add_command(cls, command_name: str, command_line: str, is_error: bool, wd: str):
         new_line = HistoryLine(
             num=cls._next_num,
             command_line=command_line,
             status=HistoryLineStatus.ERROR if is_error else HistoryLineStatus.SUCCESS,
-            wd=wd
+            wd=wd,
+            command_name=command_name
         )
         cls.history.append(new_line)
         cls._next_num += 1

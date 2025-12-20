@@ -25,11 +25,11 @@ class CATBashCommand(BashCommand):
         def validate_path(path: str):
             if not fs.properties.existing_path(path):
                 self._params.remove(path)
-                return BashNoSuchFileOrDirectoryError(name=self._name(),
+                return BashNoSuchFileOrDirectoryError(name=self.name(),
                                                       filename=path)
             elif fs.properties.is_dir(path):
                 self._params.remove(path)
-                return BashCommandError(name=self._name(), msg=f"'{path}': Is a directory")
+                return BashCommandError(name=self.name(), msg=f"'{path}': Is a directory")
             return None
 
         return default_validate_params(params=self._params, if_no_params=None, validate_path=validate_path)

@@ -20,7 +20,7 @@ class CDBashCommand(BashCommand):
 
         # We know: there is only one parameter
         path = self._params[0]
-        command_name = self._name()
+        command_name = self.name()
         if not fs.properties.existing_path(path):
             raise BashNoSuchFileOrDirectoryError(name=command_name, filename=path)
         elif not fs.properties.is_dir(path):

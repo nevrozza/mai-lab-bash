@@ -16,4 +16,4 @@ class CPBashCommand(BashCommand):
         return ""
 
     def _validate_params(self) -> list[BashError]:
-        return cp_mv_validate_params(params=self._params, command_name=self._name())
+        return cp_mv_validate_params(params=self._params, command_name=self.name())

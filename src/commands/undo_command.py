@@ -12,5 +12,5 @@ class UndoBashCommand(BashCommand):
 
     def _validate_params(self) -> list[BashError]:
         if not ((not self._params) or (len(self._params) == 1 and self._params[0].isdigit())):
-            raise BashCommandError(name=self._name(), msg="you have to use number for undo")
+            raise BashCommandError(name=self.name(), msg="you have to use number for undo")
         return []
