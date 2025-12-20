@@ -1,4 +1,5 @@
 import inspect
+import shlex
 from abc import ABC, abstractmethod
 
 from src.core.config import BashConfig
@@ -81,8 +82,20 @@ class BashCommand(ABC):
 class UndoableBashCommand(BashCommand, ABC):
     undoable_commands: set[str] = set()
 
-    @staticmethod
-    def undo(history_line: HistoryLine):
+    @classmethod
+    def _parse_history_line(cls, history_line: HistoryLine) -> tuple[set[str], list[str]]:
+        flags: set[str] = set()
+        params = []
+        for par in shlex.split(history_line.command_line)[1:]:
+            if par.startswith("-") and len(par) > 1:
+                for f in par[1:]:
+                    flags.add(f)
+            else:
+                params.append(par)
+        return flags, params
+
+    @classmethod
+    def undo(cls, history_line: HistoryLine):
         pass
 
     def __init_subclass__(cls: UndoableBashCommand, **kwargs):

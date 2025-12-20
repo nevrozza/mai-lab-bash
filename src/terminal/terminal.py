@@ -10,6 +10,7 @@ from src.terminal.autocomplete import Autocomplete
 from src.terminal.command import BashCommand
 from src.terminal.file_system.fs import fs
 from src.terminal.history import HistoryManager
+from src.utils.get_command_raw_params import get_command_raw_params
 
 
 # https://docs-python.ru/standart-library/modul-readline-python/
@@ -61,7 +62,7 @@ class Terminal:
         try:
             for command_line in input_line.split(";"):
                 if command_line.strip():
-                    name, raw_params = cls._get_command_raw_params(command_line)
+                    name, raw_params = get_command_raw_params(command_line)
                     try:
                         bash_command = BashCommand.get_command(name)
                         commands.append(bash_command(raw_params, command_line))
@@ -71,13 +72,3 @@ class Terminal:
         except BashSyntaxError as e:
             log(e)
         return commands
-
-    @staticmethod
-    def _get_command_raw_params(command: str) -> tuple[str, list[str]]:
-        try:
-            params = shlex.split(command)
-            name = params[0]
-            etc = params[1:]
-            return name, etc
-        except IndexError, ValueError:
-            raise BashSyntaxError
