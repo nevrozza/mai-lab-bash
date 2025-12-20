@@ -20,9 +20,8 @@ class BashCommand(ABC):
         return cls.__name__.removesuffix("BashCommand").lower()
 
     @property
-    @abstractmethod
     def _supported_flags(self) -> str:
-        pass
+        return ""
 
     @property
     def _max_params_count(self) -> int | None:
