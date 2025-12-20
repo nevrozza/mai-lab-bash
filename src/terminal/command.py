@@ -1,8 +1,10 @@
+import inspect
 from abc import ABC, abstractmethod
 
 from src.core.config import BashConfig
 from src.core.errors import BashNoSupportForLongFlagsError, BashInvalidFlagError, BashMoreParamsThenExpectedError, \
     BashError
+from src.terminal.history import HistoryLine
 from src.utils.immutable_dict import ImmutableDict
 
 
@@ -50,7 +52,7 @@ class BashCommand(ABC):
                 for f in par[1:]:
                     if f not in self._supported_flags:
                         if not BashConfig.IGNORE_EXTRA_FLAGS:
-                            raise BashInvalidFlagError
+                            raise BashInvalidFlagError(name=self._name(), flag=f, supported=self._supported_flags)
                     else:
                         flags.add(f)
             else:
@@ -71,5 +73,20 @@ class BashCommand(ABC):
 
     def __init_subclass__(cls: BashCommand, **kwargs):
         """Добавляем команды в словарь для автокомплита и вызова команд"""
-        # LSBashCommand -> ls
-        cls._all_commands[cls._name()] = cls
+
+        if not inspect.isabstract(cls):
+            cls._all_commands[cls._name()] = cls
+
+
+class UndoableBashCommand(BashCommand, ABC):
+    undoable_commands: list = {}
+
+    @abstractmethod
+    def undo(self, history_line: HistoryLine):
+        pass
+
+    def __init_subclass__(cls: UndoableBashCommand, **kwargs):
+        """Добавляем команды в словарь для автокомплита и вызова команд"""
+        super().__init_subclass__(**kwargs)
+        if not inspect.isabstract(cls):
+            cls.undoable_commands.append(cls._name())  # для поискаhgi undo
