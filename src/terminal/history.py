@@ -1,5 +1,5 @@
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from enum import Enum
 from pathlib import Path
 
@@ -71,7 +71,7 @@ class HistoryManager:
             data = [
                 {
                     'num': line.num,
-                    'name': line.command_line,
+                    'name': line.command_name,
                     'command': line.command_line,
                     'status': line.status.value,
                     'wd': line.wd
@@ -96,3 +96,15 @@ class HistoryManager:
         cls.history.append(new_line)
         cls._next_num += 1
         cls._save()
+
+    @classmethod
+    def get_line_by_num(cls, num: int) -> HistoryLine | None:
+        return next((line for line in reversed(cls.history) if line.num == num), None)
+
+    @classmethod
+    def mark_undo(cls, history_line):
+        for i in range(len(cls.history) - 1, -1, -1):
+            if cls.history[i] == history_line:
+                cls.history[i] = replace(history_line, status=HistoryLineStatus.UNDO)
+                cls._save()
+                break

@@ -79,10 +79,10 @@ class BashCommand(ABC):
 
 
 class UndoableBashCommand(BashCommand, ABC):
-    undoable_commands: set[str] = {}
+    undoable_commands: set[str] = set()
 
-    @abstractmethod
-    def undo(self, history_line: HistoryLine):
+    @staticmethod
+    def undo(history_line: HistoryLine):
         pass
 
     def __init_subclass__(cls: UndoableBashCommand, **kwargs):
