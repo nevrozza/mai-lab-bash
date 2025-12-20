@@ -1,3 +1,6 @@
 class BashConfig:
-    ignore_extra_flags = False
-    enable_default_commands = True
+    IGNORE_EXTRA_FLAGS = False
+    ENABLE_DEFAULT_COMMANDS = True
+
+    HISTORY_FILE_NAME = ".history"
+    LOGS_FILE_NAME = "shell.log"

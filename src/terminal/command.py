@@ -9,10 +9,11 @@ from src.utils.immutable_dict import ImmutableDict
 class BashCommand(ABC):
     _all_commands: dict[str, BashCommand] = {}
 
-    def __init__(self, raw_params: list[str]):
-        self._raw_params = raw_params
+    def __init__(self, raw_params: list[str], command_line: str):
+        self.__raw_params = raw_params
         self._flags: set[str] = set()
         self._params: list[str] = []
+        self.command_line = command_line
 
     @classmethod
     def _name(cls) -> str:
@@ -36,7 +37,7 @@ class BashCommand(ABC):
         pass
 
     def execute(self) -> tuple[list[BashError], str]:
-        self._flags, self._params = self._parse_raw_params(self._raw_params)
+        self._flags, self._params = self._parse_raw_params(self.__raw_params)
         return self._validate_params(), self._exec()
 
     def _parse_raw_params(self, raw_params: list[str]) -> tuple[set[str], list[str]]:
@@ -48,7 +49,7 @@ class BashCommand(ABC):
                     raise BashNoSupportForLongFlagsError
                 for f in par[1:]:
                     if f not in self._supported_flags:
-                        if not BashConfig.ignore_extra_flags:
+                        if not BashConfig.IGNORE_EXTRA_FLAGS:
                             raise BashInvalidFlagError
                     else:
                         flags.add(f)

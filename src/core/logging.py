@@ -1,5 +1,7 @@
 import logging
 
+from src.core.config import BashConfig
+
 
 class ShellFormatter(logging.Formatter):
     def format(self, record):
@@ -16,7 +18,7 @@ def setup_shell_logger():
     logger = logging.getLogger("shell_logger")
     logger.setLevel(logging.INFO)
 
-    file = logging.FileHandler("shell.log", mode="w", encoding="utf-8")
+    file = logging.FileHandler(BashConfig.LOGS_FILE_NAME, mode="w", encoding="utf-8")
 
     file_formatter = ShellFormatter("[%(asctime)s] %(levelname)s%(message)s",
                                     datefmt="%Y-%m-%d %H:%M:%S")
@@ -29,9 +31,9 @@ def setup_shell_logger():
 shell_logger = setup_shell_logger()
 
 
-def log(output: str | Exception, console_output: bool = True):
+def log(output: str | Exception, console_output: bool = True, file_output: bool = True):
     console_output and print(output)
     if isinstance(output, Exception):
-        shell_logger.error(output)
+        file_output and shell_logger.error(output)
     else:
-        shell_logger.info(output)
+        file_output and shell_logger.info(output)
