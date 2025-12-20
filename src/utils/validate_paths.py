@@ -10,7 +10,7 @@ def validate_paths(
 ) -> list[BashError]:
     errors = []
     if not params:
-        if_no_params() or params.append(fs.cwd_str())
+        if_no_params or params.append(fs.cwd_str())
     else:
         for path in params[:]:  # copy
             if not fs.properties.existing_path(path):

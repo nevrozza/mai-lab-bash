@@ -54,10 +54,11 @@ class BashCommand(ABC):
                     else:
                         flags.add(f)
             else:
-                if not self._max_params_count or len(params) <= self._max_params_count:
+                #                           +1 cuz we haven't append new parameter yet
+                if (not self._max_params_count) or (len(params) + 1) <= self._max_params_count:
                     params.append(par)
                 else:
-                    raise BashMoreParamsThenExpectedError
+                    raise BashMoreParamsThenExpectedError(self._name())
         return flags, params
 
     @classmethod

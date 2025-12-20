@@ -16,7 +16,8 @@ class FS:
         self.properties = properties
 
     def cd(self, path_str: str):
-        self.from_tilda = path_str.startswith('~')
+        if path_str and path_str[0] in ("~", "/"):
+            self.from_tilda = path_str.startswith("~")
         os.chdir(resolve_path(path_str))
 
     @resolve_path_deco
