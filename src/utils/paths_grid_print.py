@@ -4,12 +4,13 @@ import shutil
 from math import ceil
 
 from src.terminal.file_system.fs import fs
-from src.utils.quoting_type import QuotingType
+from src.utils.print_builder import PrintBuilder
 
 
-def paths_grid_print(paths: list[pathlib.Path]):
+def paths_grid_output(paths: list[pathlib.Path]) -> PrintBuilder:
+    builder = PrintBuilder()
     if not paths:
-        return
+        return builder
 
     (terminal_width, _) = shutil.get_terminal_size()
     column_width = max([len(file.name) for file in paths]) + 4
@@ -29,4 +30,5 @@ def paths_grid_print(paths: list[pathlib.Path]):
                 line_parts.append(f"{fs.normalize_name(name=file.name, path=file):<{column_width}}")
 
         if line_parts:
-            print(''.join(line_parts))
+            builder.append(''.join(line_parts))
+    return builder
