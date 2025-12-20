@@ -32,11 +32,13 @@ def cp_mv_validate_params(
 
     def validate_path(path: str):
         nonlocal path_index
-        if not fs.properties.existing_path(path):
+        if (path_index+1) < len(params) and not fs.properties.existing_path(path):
             raise BashNoSuchFileOrDirectoryError(name=command_name, filename=path)
-        if (len(params) > 2 and path_index == (len(params) - 1) and
-                not fs.properties.is_dir(path)):  # cp/mv file1 file2 dir
-            raise BashNotADirectoryError(name=command_name, filename=path)
+        if len(params) > 2 and path_index == (len(params) - 1):  # cp/mv file1 file2 dir
+            if not fs.properties.existing_path(path):
+                raise BashNoSuchFileOrDirectoryError(name=command_name, filename=path)
+            elif not fs.properties.is_dir(path):
+                raise BashNotADirectoryError(name=command_name, filename=path)
         path_index += 1
 
     for pathx in params:
