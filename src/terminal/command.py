@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
 
-from src.utils.config import BashConfig
-from src.utils.errors import BashNoSupportForLongFlagsError, BashInvalidFlagError, BashMoreParamsThenExpectedError
+from src.core.config import BashConfig
+from src.core.errors import BashNoSupportForLongFlagsError, BashInvalidFlagError, BashMoreParamsThenExpectedError, \
+    BashError
 from src.utils.immutable_dict import ImmutableDict
 
 
@@ -23,17 +24,16 @@ class BashCommand(ABC):
         return None
 
     @abstractmethod
-    def _exec(self):
+    def _exec(self) -> str:
         pass
 
     @abstractmethod
-    def _validate_params(self):
+    def _validate_params(self) -> list[BashError]:
         pass
 
-    def execute(self):
+    def execute(self) -> tuple[list[BashError], str]:
         self._flags, self._params = self._parse_raw_params(self._raw_params)
-        self._validate_params()
-        self._exec()
+        return self._validate_params(), self._exec()
 
     def __init__(self, raw_params: list[str]):
         self._raw_params = raw_params

@@ -6,8 +6,9 @@ from src.commands.import_default_commands import import_default_commands
 from src.terminal.autocomplete import Autocomplete
 from src.terminal.command import BashCommand
 from src.terminal.file_system.fs import fs
-from src.utils.config import BashConfig
-from src.utils.errors import BashSyntaxError
+from src.core.config import BashConfig
+from src.core.errors import BashSyntaxError, BashError
+from src.core.logging import shell_logger, log
 
 
 # https://docs-python.ru/standart-library/modul-readline-python/
@@ -27,13 +28,21 @@ class Terminal:
             input_line = input(
                 f"{Fore.LIGHTGREEN_EX}meow@user{Fore.RESET}:{Fore.LIGHTBLUE_EX}{fs.cwd_str()}{Fore.RESET}$ "
             )
+            log(f"> {fs.cwd_str()}$ {input_line}", console_output=False)
             commands = self._parse_commands(input_line)
             self._execute_commands(commands)
 
     @staticmethod
     def _execute_commands(commands: list[BashCommand]):
         for command in commands:
-            command.execute()
+            try:
+                not_critical_errors, output = command.execute()
+                if not_critical_errors:
+                    for error in not_critical_errors:
+                        log(error)
+                output and log(output)
+            except BashError as output:
+                log(output)
 
     @classmethod
     def _parse_commands(cls, input_line: str) -> list[BashCommand]:
@@ -46,9 +55,9 @@ class Terminal:
                     command = BashCommand.get_command(name)
                     commands.append(command(raw_params))
                 except KeyError:
-                    print(f"'{name}' command not found")
-        except BashSyntaxError:
-            print(f"syntax error!")
+                    log(f"'{name}' command not found")
+        except BashSyntaxError as e:
+            log(e)
         return commands
 
     @staticmethod
@@ -58,5 +67,5 @@ class Terminal:
             name = params[0]
             etc = params[1:]
             return name, etc
-        except IndexError:
+        except IndexError, ValueError:
             raise BashSyntaxError

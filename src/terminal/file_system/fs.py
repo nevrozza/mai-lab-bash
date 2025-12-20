@@ -21,7 +21,7 @@ class FS:
 
     @resolve_path_deco
     def ls(self, path) -> list[pathlib.Path]:
-        return list(path.iterdir())
+        return list(sorted(path.iterdir()))
 
     def cwd_str(self) -> str:
         cwd = str(pathlib.Path.cwd())
@@ -30,7 +30,7 @@ class FS:
         return cwd
 
     @staticmethod
-    def normalize_name(name: str, quoting_type: QuotingType = QuotingType.SINGLE_QUOTE,
+    def normalize_name(name: str, quoting_type: QuotingType = QuotingType.ESCAPING_TYPE,
                        path: pathlib.Path | None = None) -> str:
         parts = name.split()
 

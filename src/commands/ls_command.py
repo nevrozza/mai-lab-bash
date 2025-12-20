@@ -1,8 +1,12 @@
 import pathlib
 
+from src.core.errors import BashError, BashNoSuchFileOrDirectory
 from src.terminal.command import BashCommand
 from src.terminal.file_system.fs import fs
-from src.terminal.file_system.resolve_path import resolve_path, resolve_path_deco
+from src.terminal.file_system.resolve_path import resolve_path_deco
+from src.terminal.file_system.utils import PathDetails
+from src.utils.paths_grid_print import paths_grid_output
+from src.utils.print_builder import PrintBuilder
 
 
 class LSBashCommand(BashCommand):
@@ -10,25 +14,52 @@ class LSBashCommand(BashCommand):
     def _supported_flags(self) -> str:
         return "la"
 
-    def _exec(self):
-        for param in self._params:
+    def _exec(self) -> str:
+        print_builder = PrintBuilder()
+        for path in self._params:
             if len(self._params) > 1:
-                print(f"{param}:")
+                fs.properties.is_dir(path) and print_builder.append(f"{path}:")
             # noinspection PyTypeChecker
-            self._print_items(param)
+            print_builder.append(self._get_output_items(path))
+        return print_builder.get()
 
     @resolve_path_deco
-    def _print_items(self, path: pathlib.Path):
-        is_dir = fs.properties.is_dir(path)
-        content = fs.ls(path) if is_dir else [path]
+    def _get_output_items(self, path: pathlib.Path) -> PrintBuilder:
         show_hidden = 'a' in self._flags
         detailed = 'l' in self._flags
-        print(content)
+        is_dir = fs.properties.is_dir(path)
+        content = list(
+            filter(lambda p: show_hidden or not fs.properties.is_hidden(p), fs.ls(path) if is_dir else [path]))
+        if detailed:
+            return self._detailed_output(is_dir, content)
+        else:
+            return paths_grid_output(content)
 
-    def _validate_params(self):
+    @staticmethod
+    def _detailed_output(is_dir: bool, paths: list[pathlib.Path]) -> PrintBuilder:
+        builder = PrintBuilder()
+        total_blocks = 0
+        output_details: list[PathDetails] = []
+
+        for path in paths:
+            details = fs.properties.get_path_details(path)
+            output_details.append(details)
+            total_blocks += details.blocks
+        is_dir and builder.append(f"total {total_blocks}")
+
+        for details in output_details:
+            builder.append(
+                f"{details.permissions} {details.blocks:>2} {details.owner:<8} {details.group:<8} {details.size:>8}"
+                f" {details.modification_time} {fs.normalize_name(details.name, path=details.path)}")
+        return builder
+
+    def _validate_params(self) -> list[BashError]:
+        errors = []
         if not self._params:
             self._params.append(fs.cwd_str())
         else:
-            for index, path in enumerate(self._params):
+            for path in self._params[:]:  # not
                 if not fs.properties.existing_path(path):
-                    self._params.pop(index)
+                    self._params.remove(path)
+                    errors.append(BashNoSuchFileOrDirectory(name=self._name(), filename=path))
+        return errors
