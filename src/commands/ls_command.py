@@ -18,7 +18,7 @@ class LSBashCommand(BashCommand):
         print_builder = PrintBuilder()
         for path in self._params:
             if len(self._params) > 1:
-               fs.properties.is_dir(path) and print_builder.append(f"{path}:")
+                fs.properties.is_dir(path) and print_builder.append(f"{path}:")
             # noinspection PyTypeChecker
             print_builder.append(self._get_output_items(path))
         return print_builder.get()

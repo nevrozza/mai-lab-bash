@@ -21,7 +21,7 @@ class FS:
 
     @resolve_path_deco
     def ls(self, path) -> list[pathlib.Path]:
-        return list(path.iterdir())
+        return list(sorted(path.iterdir()))
 
     def cwd_str(self) -> str:
         cwd = str(pathlib.Path.cwd())
