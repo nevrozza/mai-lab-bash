@@ -20,16 +20,26 @@ class BashCommandError(BashError):
         super().__init__(f"{name}: {msg}")
 
 
+class BashMissingDestinationFileOperandError(BashCommandError):
+    def __init__(self, name: str, prev_path: str):
+        super().__init__(name=name, msg=f"missing destination file operand after '{prev_path}'")
+
+
+class BashMissingFileOperandError(BashCommandError):
+    def __init__(self, name: str):
+        super().__init__(name=name, msg="missing file operand")
+
+
 class BashMoreParamsThenExpectedError(BashCommandError):
     def __init__(self, name: str):
         super().__init__(name=name, msg="too many arguments")
 
 
-class BashNoSuchFileOrDirectory(BashCommandError):
+class BashNoSuchFileOrDirectoryError(BashCommandError):
     def __init__(self, name: str, filename: str):
         super().__init__(name=name, msg=f"cannot access '{filename}': No such file or directory")
 
 
-class BashNotADirectory(BashCommandError):
+class BashNotADirectoryError(BashCommandError):
     def __init__(self, name: str, filename: str):
         super().__init__(name=name, msg=f"{filename}: Not a directory")

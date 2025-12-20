@@ -1,6 +1,6 @@
 import pathlib
 
-from src.core.errors import BashError, BashNoSuchFileOrDirectory
+from src.core.errors import BashError, BashNoSuchFileOrDirectoryError
 from src.terminal.command import BashCommand
 from src.terminal.file_system.fs import fs
 from src.terminal.file_system.resolve_path import resolve_path_deco
@@ -58,8 +58,8 @@ class LSBashCommand(BashCommand):
         def validate_path(path: str):
             if not fs.properties.existing_path(path):
                 self._params.remove(path)
-                return BashNoSuchFileOrDirectory(name=self._name(),
-                                                 filename=path)
+                return BashNoSuchFileOrDirectoryError(name=self._name(),
+                                                      filename=path)
             return None
 
         return default_validate_params(
