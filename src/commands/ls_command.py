@@ -7,7 +7,7 @@ from src.terminal.file_system.resolve_path import resolve_path_deco
 from src.terminal.file_system.utils import PathDetails
 from src.utils.paths_grid_print import paths_grid_output
 from src.utils.print_builder import PrintBuilder
-from src.utils.validate_paths import validate_paths
+from src.utils.validate_params import default_validate_params
 
 
 class LSBashCommand(BashCommand):
@@ -55,4 +55,15 @@ class LSBashCommand(BashCommand):
         return builder
 
     def _validate_params(self) -> list[BashError]:
-        return validate_paths(params=self._params, command_name=self._name())
+        def validate_path(path: str):
+            if not fs.properties.existing_path(path):
+                self._params.remove(path)
+                return BashNoSuchFileOrDirectory(name=self._name(),
+                                                 filename=path)
+            return None
+
+        return default_validate_params(
+            params=self._params,
+            if_no_params=lambda: self._params.append(fs.cwd_str()),
+            validate_path=validate_path
+        )

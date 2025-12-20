@@ -1,18 +1,12 @@
 from src.core.errors import BashError, BashNoSuchFileOrDirectory, BashNotADirectory
 from src.terminal.command import BashCommand
 from src.terminal.file_system.fs import fs
-from src.utils.print_builder import PrintBuilder
-from src.utils.validate_paths import validate_paths
 
 
 class CDBashCommand(BashCommand):
     @property
     def _max_params_count(self) -> int:
         return 1
-
-    @property
-    def _supported_flags(self) -> str:
-        return ""
 
     def _exec(self) -> str:
         len(self._params) == 1 and fs.cd(self._params[0])
