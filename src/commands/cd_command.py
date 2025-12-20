@@ -1,4 +1,4 @@
-from src.core.errors import BashError, BashNoSuchFileOrDirectory, BashNotADirectory
+from src.core.errors import BashError, BashNoSuchFileOrDirectoryError, BashNotADirectoryError
 from src.terminal.command import BashCommand
 from src.terminal.file_system.fs import fs
 
@@ -22,8 +22,8 @@ class CDBashCommand(BashCommand):
         path = self._params[0]
         command_name = self._name()
         if not fs.properties.existing_path(path):
-            raise BashNoSuchFileOrDirectory(name=command_name, filename=path)
+            raise BashNoSuchFileOrDirectoryError(name=command_name, filename=path)
         elif not fs.properties.is_dir(path):
-            raise BashNotADirectory(name=command_name, filename=path)
+            raise BashNotADirectoryError(name=command_name, filename=path)
 
         return []
