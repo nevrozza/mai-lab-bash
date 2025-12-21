@@ -48,6 +48,12 @@ class RMBashCommand(UndoableBashCommand):
                                                       filename=path)
             elif fs.properties.is_dir(path) and "r" not in self._flags:
                 raise BashCommandError(self.name(), msg=f"can't rm: '{path}' is a dir but '-r' not specified")
+
+            resolved = resolve_path(path)
+            cwd = resolve_path(fs.cwd_str())
+            if resolved == cwd or resolved in cwd.parents:
+                raise BashCommandError(self.name(), msg=f"cannot remove '{path}': it is current or parent directory")
+
             return None
 
         return default_validate_params(
