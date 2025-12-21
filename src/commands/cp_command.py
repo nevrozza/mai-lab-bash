@@ -1,5 +1,4 @@
 import pathlib
-import shutil
 
 from src.core.errors import BashError, BashCommandError
 from src.terminal.command import UndoableBashCommand
