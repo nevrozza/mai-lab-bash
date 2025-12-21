@@ -9,12 +9,12 @@ from src.utils.validate_params import default_validate_params
 
 
 class CATBashCommand(BashCommand):
-    def _exec(self) -> str:
+    def _exec(self) -> tuple[list[BashError], str | None] | None:
         print_builder = PrintBuilder()
         for path in self._params:
             # noinspection PyTypeChecker
             print_builder.append(self.read_file(path).strip())
-        return print_builder.get()
+        return [], print_builder.get()
 
     @staticmethod
     @resolve_path_deco

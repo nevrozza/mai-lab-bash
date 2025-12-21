@@ -32,14 +32,14 @@ class BashCommand(ABC):
         return None
 
     @abstractmethod
-    def _exec(self) -> str:
+    def _exec(self) -> tuple[list[BashError], str | None] | None:
         pass
 
     @abstractmethod
     def _validate_params(self) -> list[BashError]:
         pass
 
-    def execute(self) -> tuple[list[BashError], str]:
+    def execute(self) -> tuple[list[BashError], tuple[list[BashError], str]]:
         self._flags, self._params = self._parse_raw_params(self.__raw_params)
         return self._validate_params(), self._exec()
 
@@ -95,7 +95,7 @@ class UndoableBashCommand(BashCommand, ABC):
         return flags, params
 
     @classmethod
-    def undo(cls, history_line: HistoryLine):
+    def undo(cls, history_line: HistoryLine) -> list[BashError]:
         pass
 
     def __init_subclass__(cls: UndoableBashCommand, **kwargs):

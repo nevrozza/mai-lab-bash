@@ -8,7 +8,7 @@ class CDBashCommand(BashCommand):
     def _max_params_count(self) -> int:
         return 1
 
-    def _exec(self) -> str | None:
+    def _exec(self) -> tuple[list[BashError], str | None] | None:
         len(self._params) == 1 and fs.cd(self._params[0])
 
     def _validate_params(self) -> list[BashError]:

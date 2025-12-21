@@ -1,3 +1,4 @@
+import pathlib
 import shutil
 
 from src.core.errors import BashError, BashCommandError
@@ -17,6 +18,9 @@ class CPBashCommand(UndoableBashCommand):
     def undo(cls, history_line: HistoryLine):
         flags, params = cls._parse_history_line(history_line)
 
+        def delete(t_d: pathlib.Path):
+            fs.properties.existing_path(t_d) and fs.rm(t_d)
+
         for path in params[:-1]:
             if not fs.properties.existing_path(path):
                 raise BashCommandError(name=cls.name(), msg="can't undo `cp`: original doesn't exist")
@@ -24,14 +28,14 @@ class CPBashCommand(UndoableBashCommand):
         if len(params) == 2:
             to_delete = resolve_path(params[1], history_line.wd)
             to_delete = (to_delete / resolve_path(params[0]).name) if fs.properties.is_dir(to_delete) else to_delete
-            fs.rm(to_delete)
+            delete(to_delete)
         else:
             for path in params[:-1]:
                 delete_dir = resolve_path(params[-1], history_line.wd)
                 to_delete = resolve_path(path, delete_dir)
-                fs.rm(to_delete)
+                delete(to_delete)
 
-    def _exec(self) -> str | None:
+    def _exec(self) -> tuple[list[BashError], str | None] | None:
         for path in self._params[:-1]:
             fs.cp(resolve_path(path), resolve_path(self._params[-1]))
 
