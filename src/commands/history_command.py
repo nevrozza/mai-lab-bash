@@ -10,7 +10,7 @@ class HistoryBashCommand(BashCommand):
     def _max_params_count(self) -> int | None:
         return 1
 
-    def _exec(self) -> str:
+    def _exec(self) -> tuple[list[BashError], str | None] | None:
         print_builder = PrintBuilder()
         start = -int(self._params[0]) if self._params else 0
         history = HistoryManager.history[start:]
@@ -18,7 +18,7 @@ class HistoryBashCommand(BashCommand):
             if line.status != HistoryLineStatus.UNDO:
                 print_builder.append(
                     f"{line.num:^5} {"*" if (could_be_undo(line)) else " "} {line.command_line}")
-        return print_builder.get()
+        return [], print_builder.get()
 
     def _validate_params(self) -> list[BashError]:
         if not ((not self._params) or (len(self._params) == 1 and self._params[0].isdigit())):

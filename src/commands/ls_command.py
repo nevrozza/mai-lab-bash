@@ -15,14 +15,14 @@ class LSBashCommand(BashCommand):
     def _supported_flags(self) -> str:
         return "la"
 
-    def _exec(self) -> str:
+    def _exec(self) -> tuple[list[BashError], str | None] | None:
         print_builder = PrintBuilder()
         for path in self._params:
             if len(self._params) > 1:
                 fs.properties.is_dir(path) and print_builder.append(f"{path}:")
             # noinspection PyTypeChecker
             print_builder.append(self._get_output_items(path))
-        return print_builder.get()
+        return [], print_builder.get()
 
     @resolve_path_deco
     def _get_output_items(self, path: pathlib.Path) -> PrintBuilder:

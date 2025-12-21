@@ -42,7 +42,8 @@ class Terminal:
             cwd = fs.cwd_str()
             is_error = False
             try:
-                not_critical_errors, output = command.execute()
+                not_critical_validation_errors, (not_critical_exec_errors, output) = command.execute()
+                not_critical_errors = not_critical_validation_errors + not_critical_exec_errors
                 if not_critical_errors:
                     for error in not_critical_errors:
                         log(error)
