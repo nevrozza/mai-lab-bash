@@ -1,7 +1,7 @@
 import pathlib
 
+from src.commands.custom_abc.undoable_command import UndoableBashCommand
 from src.core.errors import BashError, BashCommandError
-from src.terminal.command import UndoableBashCommand
 from src.terminal.file_system.fs import fs
 from src.terminal.file_system.resolve_path import resolve_path
 from src.terminal.history import HistoryLine

@@ -1,11 +1,10 @@
-import pathlib
-
+from src.commands.custom_abc.undoable_command import UndoableBashCommand
 from src.core.errors import BashError, BashCommandError, BashNoSuchFileOrDirectoryError
-from src.terminal.command import UndoableBashCommand
+
 from src.terminal.file_system.fs import fs
 from src.terminal.file_system.resolve_path import resolve_path
 from src.terminal.history import HistoryLine
-from src.utils.validate_params import cp_mv_validate_params, default_validate_params
+from src.utils.validate_params import default_validate_params
 
 
 class RMBashCommand(UndoableBashCommand):

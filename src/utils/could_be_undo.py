@@ -1,4 +1,4 @@
-from src.terminal.command import UndoableBashCommand
+from src.commands.custom_abc.undoable_command import UndoableBashCommand
 from src.terminal.history import HistoryLine, HistoryLineStatus
 
 
