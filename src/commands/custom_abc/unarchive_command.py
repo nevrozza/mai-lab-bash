@@ -22,7 +22,7 @@ class UnarchiveBashCommand(BashCommand, ABC):
     def _get_extract_dir(self):
         tries = 0
         while True:
-            maybe_name = ".".join(self._params[0].split(".")[:-1]) + (str(tries) if tries > 0 else "")
+            maybe_name = ".".join(self._params[0].removesuffix(".gz").split(".")[:-1]) + (str(tries) if tries > 0 else "")
             if fs.properties.existing_path(maybe_name):
                 tries += 1
             else:
