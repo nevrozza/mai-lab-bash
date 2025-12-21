@@ -43,10 +43,13 @@ class MVBashCommand(UndoableBashCommand):
         errors = []
         dist_path = resolve_path(self._params[-1])
         for path in self._params[:-1]:
-            if not fs.properties.existing_path(dist_path):
-                fs.mv(resolve_path(path))
+            p1 = resolve_path(path)
+            if not fs.properties.existing_path(dist_path / p1.name):
+                if fs.properties.is_dir(p1):
+                    dist_path /= p1.name
+                fs.mv(p1, dist_path)
             else:
-                errors.append(BashCommandError(name=self.name(), msg = f"destination '{dist_path}' already exists"))
+                errors.append(BashCommandError(name=self.name(), msg=f"destination '{dist_path}' already exists"))
         return errors, ""
 
     def _validate_params(self) -> list[BashError]:
