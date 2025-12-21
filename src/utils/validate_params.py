@@ -1,5 +1,5 @@
 from src.core.errors import BashError, BashMissingDestinationFileOperandError, BashMissingFileOperandError, \
-    BashNoSuchFileOrDirectoryError, BashNotADirectoryError
+    BashNoSuchFileOrDirectoryError, BashNotADirectoryError, BashCommandError
 from src.terminal.file_system.fs import fs
 
 
@@ -21,7 +21,8 @@ def default_validate_params(
 
 def cp_mv_validate_params(
         params: list[str],
-        command_name: str
+        command_name: str,
+        allow_dirs: bool,
 ):
     if len(params) == 1:
         raise BashMissingDestinationFileOperandError(name=command_name, prev_path=params[0])
@@ -32,8 +33,11 @@ def cp_mv_validate_params(
 
     def validate_path(path: str):
         nonlocal path_index
-        if (path_index+1) < len(params) and not fs.properties.existing_path(path):
-            raise BashNoSuchFileOrDirectoryError(name=command_name, filename=path)
+        if (path_index + 1) < len(params):  # check no destination
+            if not fs.properties.existing_path(path):
+                raise BashNoSuchFileOrDirectoryError(name=command_name, filename=path)
+            elif fs.properties.is_dir(path) and (not allow_dirs):
+                raise BashCommandError(command_name, msg="-r not specified")
         if len(params) > 2 and path_index == (len(params) - 1):  # cp/mv file1 file2 dir
             if not fs.properties.existing_path(path):
                 raise BashNoSuchFileOrDirectoryError(name=command_name, filename=path)

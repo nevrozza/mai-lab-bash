@@ -1,5 +1,6 @@
 import os
 import pathlib
+import shutil
 from shutil import rmtree
 
 from src.terminal.file_system.fs_properties import FSProperties
@@ -15,6 +16,16 @@ class FS:
     def __init__(self, properties: FSProperties):
         self.from_tilda = False
         self.properties = properties
+
+    def cp(self, path: pathlib.Path, destination: pathlib.Path):
+        if not self.properties.is_dir(path):
+            shutil.copy2(path, destination)
+        else:
+            shutil.copytree(path, destination / path.name, dirs_exist_ok=True)
+
+    @staticmethod
+    def mv(path: pathlib.Path, destination: pathlib.Path):
+        shutil.move(path, destination)
 
     @resolve_path_deco
     def rm(self, path: pathlib.Path):
