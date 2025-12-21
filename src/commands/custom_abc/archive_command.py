@@ -9,13 +9,18 @@ from src.terminal.file_system.resolve_path import resolve_path
 
 class ArchiveBashCommand(BashCommand, ABC):
 
+    @property
+    @abstractmethod
+    def file_extension(self) -> str:
+        pass
+
     @abstractmethod
     def archive(self, folder: Path, zip_name: str) -> None:
         pass
 
     def _exec(self) -> tuple[list[BashError], str | None] | None:
         folder = resolve_path(self._params[0])
-        zip_name = self._params[1] if len(self._params) > 1 else f"{folder.name}.zip"
+        zip_name = self._params[1] if len(self._params) > 1 else f"{folder.name}.{self.file_extension}"
         self.archive(folder, zip_name)
         return [], f"{self.name()} created: {zip_name}"
 

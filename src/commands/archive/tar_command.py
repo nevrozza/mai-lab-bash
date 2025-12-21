@@ -1,22 +1,19 @@
+import tarfile
 from pathlib import Path
-from zipfile import ZipFile
 
 from src.commands.custom_abc.archive_command import ArchiveBashCommand
 
 
-class ZipBashCommand(ArchiveBashCommand):
+class TarBashCommand(ArchiveBashCommand):
     @property
     def file_extension(self) -> str:
-        return "zip"
+        return "tar.gz"
 
     def archive(self, folder: Path, zip_name: str) -> None:
-        with ZipFile(zip_name, "w") as zf:
-            for file in folder.iterdir():
-                zf.write(file, arcname=file.name)
+        with tarfile.open(zip_name, "w:gz") as tar:
+            for f in folder.iterdir():
+                tar.add(f, arcname=f.name)
 
     @classmethod
     def name(cls) -> str:
-        return "zip"
-
-
-
+        return "tar"
