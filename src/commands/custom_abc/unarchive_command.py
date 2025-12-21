@@ -32,7 +32,7 @@ class UnarchiveBashCommand(BashCommand, ABC):
         archive = resolve_path(self._params[0])
         extract_dir = resolve_path(self._get_extract_dir())
         self.unarchive(archive, extract_dir)
-        return [], f"{self.name()} unarchived: {archive.name} -> {extract_dir.name}"
+        return [], f"{self.name()}: {archive.name} -> {extract_dir.name}"
 
     @property
     def _max_params_count(self) -> int | None:

@@ -32,6 +32,7 @@ class RMBashCommand(UndoableBashCommand):
         for path in self._params:
             to_rm = resolve_path(path)
             trash_folder = resolve_path(".trash")
+            trash_folder.mkdir(parents=True, exist_ok=True)
             if fs.properties.is_dir(to_rm):
                 if "f" not in self._flags:
                     answer = input(f"rm dir '{to_rm}'? [y/n] ")

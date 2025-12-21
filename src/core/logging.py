@@ -1,6 +1,7 @@
 import logging
 
 from src.core.config import BashConfig
+from src.terminal.file_system.resolve_path import resolve_path
 
 
 class ShellFormatter(logging.Formatter):
@@ -12,28 +13,36 @@ class ShellFormatter(logging.Formatter):
         return super().format(record)
 
 
-def setup_shell_logger():
-    for handler in logging.root.handlers[:]:
-        logging.root.removeHandler(handler)
-    logger = logging.getLogger("shell_logger")
-    logger.setLevel(logging.INFO)
+class Logger:
 
-    file = logging.FileHandler(BashConfig.LOGS_FILE_NAME, mode="w", encoding="utf-8")
+    @classmethod
+    def setup_shell_logger(cls):
+        for handler in logging.root.handlers[:]:
+            logging.root.removeHandler(handler)
+        logger = logging.getLogger("shell_logger")
+        logger.setLevel(logging.INFO)
 
-    file_formatter = ShellFormatter("[%(asctime)s] %(levelname)s%(message)s",
-                                    datefmt="%Y-%m-%d %H:%M:%S")
-    file.setFormatter(file_formatter)
+        file = logging.FileHandler(resolve_path(BashConfig.LOGS_FILE_NAME), mode="w", encoding="utf-8")
 
-    logger.addHandler(file)
-    return logger
+        file_formatter = ShellFormatter("[%(asctime)s] %(levelname)s%(message)s",
+                                        datefmt="%Y-%m-%d %H:%M:%S")
+        file.setFormatter(file_formatter)
 
+        logger.addHandler(file)
+        cls.shell_logger = logger
 
-shell_logger = setup_shell_logger()
+    @classmethod
+    def error(cls, message):
+        cls.shell_logger.error(message)
+
+    @classmethod
+    def info(cls, message):
+        cls.shell_logger.info(message)
 
 
 def log(output: str | Exception, console_output: bool = True, file_output: bool = True):
     console_output and print(output)
     if isinstance(output, Exception):
-        file_output and shell_logger.error(output)
+        file_output and Logger.error(output)
     else:
-        file_output and shell_logger.info(output)
+        file_output and Logger.info(output)
