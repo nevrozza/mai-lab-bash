@@ -1,27 +1,33 @@
-# WIP
+# Python. Лабораторная работа 2  
+### Bash (Easy+Medium)
 
-> [!IMPORTANT]
-> Запускать в терминале, иначе autocomplete не будет работать =(
+- **Библиотеки:**
+    - `pathlib` — _Работа с путями_
+    - `shutil` — _Файловые операции_
+    - `readline` – _Автокомплит_
+    - `logging` — _Запись всех действий в shell.log_
+    - `json` — _Сохранение истории команд между сессиями_
+    - `colorama` – _Цветной ввод_
+    - `dataclass`, `enum`, `abc`
+      
+- **Интересные штучки:**
+    - Поддержка [автокомплита](./src/terminal/autocomplete.py) _(чуть корявая)_
+    - `.trash` папка создаётся в `cwd`
+    - Очень легко добавляются кастомные команды (см. [лаб. 3]()):
+      - Необходимо просто создать и реализовать класс от [`BashCommand`](./src/terminal/command.py) (или [`UndoableBashCommand`](./src/commands/custom_abc/undoable_command.py))
+        
+      > `UndoableBashCommand`, [`ArchiveBashCommand`](./src/commands/custom_abc/archive_command.py): ABC наследники от `BashCommand` – можно реализовывать свои abc по этому принципу
 
+    - Есть возможность добавить полную поддержку _windows_:
+      - Над pathlib реализована абстракция [`FS`](./src/terminal/file_system/fs.py).
+      - Все команды обращаются к ней.
+      - Возможна подмена инстанса `fs` на кастомный класс, наследованный от `FS`.
+    - Вывод из команды `tuple[list[BashError], str]]`:
+      - `list[BashError]` – список ошибок, которые не прерывают исполнение команды (случаи с `ls dir1 dir2`), но сообщение о них логгируются и выводятся
+      - `str` – строка, которую необходимо напечатать (вывод команды)
+      - [`PrintBuilder`](./src/utils/print_builder.py) – кастомный класс, который облегчает создание одного `str` для принта нескольких строк. (`PrintBuilder.get() -> str`)
+      - Если есть ошибка, которая прерывает исполнение команды, то вызывается обычный `raise`
 
-mb fix: Команды и autocomplete типа ls;ca -> ls;cat не работает!
+### Что нового я познал?
+- Каково быть единорогом
 
-TODO:
-
-Terminal:
-- io с авто-комплитом +вызов функций
-- логгирование
-
-BashCommand(ABC)
-- ls # -l
-- cd # .. #~
-- cat
-- cp # -r
-- mv
-- rm # -r (-f?) y/n ограничения
-- grep
-
-Подумать:
-- zip, tar
-- история
-- undo?
