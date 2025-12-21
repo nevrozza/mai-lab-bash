@@ -25,6 +25,7 @@ def resolve_path_deco(func):
         resolved_path = resolve_path(path)
         return func(cls_or_self, path=resolved_path, *args, **kwargs)
 
+    # Определяем, является ли функция методом (по наличию self/cls)
     if params and (params[0] == 'self' or params[0] == 'cls'):  # Сомнительно, но окей
         return method_wrapper
     else:
@@ -33,6 +34,13 @@ def resolve_path_deco(func):
 
 # Not in FS because of using in FS and FSProperties
 def resolve_path(path: str | pathlib.Path, wd: str | pathlib.Path | None = None) -> pathlib.Path:
+    """
+    Преобразует строковый путь в абсолютный pathlib.Path с поддержкой ~, относительных путей и экранированных пробелов
+
+    :param path: путь (str | Path)
+    :param wd: рабочая директория для разрешения относительных путей (работает только для относительного пути)
+    :return: абсолютный pathlib.Path
+    """
     a = pathlib.Path(
         ((str(wd) + "/") if (wd and not path.startswith(("~", "/"))) else "") +  # support custom wd
         # forced space escaping for tab-tab-tab folder completion (workaround)

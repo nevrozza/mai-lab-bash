@@ -13,15 +13,18 @@ from src.utils.get_command_raw_params import get_command_raw_params
 
 # https://docs-python.ru/standart-library/modul-readline-python/
 class Terminal:
+    """Основной цикл терминала: обработка ввода, разбор и выполнение команд, логгирование"""
+
     def __init__(self):
         # Импоритруем дефолтные команды (если в конфиге они включены)
-        BashConfig.ENABLE_DEFAULT_COMMANDS and import_default_commands()
+        BashConfig.IMPORT_DEFAULT_COMMANDS and import_default_commands()
         # Enable autocomplete
         Autocomplete.enable()
         # Инициализируем историю команд
         HistoryManager.initialize()
 
     def cycle_input(self):
+        """Бесконечный цикл ввода команд"""
         init()  # Colorama
         fs.cd("~/Desktop")  # Start from ~/Desktop
 
@@ -40,6 +43,7 @@ class Terminal:
 
     @staticmethod
     def _execute_commands(commands: list[BashCommand]):
+        """Выполняет список команд, логгирует и добавляет их в историю"""
         for command in commands:
             cwd = fs.cwd_str()
             is_error = False
@@ -60,6 +64,9 @@ class Terminal:
 
     @classmethod
     def _parse_commands(cls, input_line: str) -> list[BashCommand]:
+        """Разбирает строку ввода на отдельные команды (разделённые ';'),
+        парсит `сырые` параметры (вместе с флагами). Возвращает список BashCommand
+        :return: list[BashCommand] – список команд"""
         cwd = fs.cwd_str()
         commands: list[BashCommand] = []
         try:

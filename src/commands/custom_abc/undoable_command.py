@@ -8,10 +8,22 @@ from src.terminal.history import HistoryLine
 
 
 class UndoableBashCommand(BashCommand, ABC):
+    """Родительский класс для команд, поддерживающих отмену (``undo``)"""
+
     undoable_commands: set[str] = set()
 
     @classmethod
+    def undo(cls, history_line: HistoryLine) -> list[BashError]:
+        """Отмена команды"""
+        pass
+
+    @classmethod
     def _parse_history_line(cls, history_line: HistoryLine) -> tuple[set[str], list[str]]:
+        """
+        Извлекает флаги и параметры из сохранённой строки команды
+
+        Отличие: мы знаем, что строка выполнилась без ошибок
+        """
         flags: set[str] = set()
         params = []
         for par in shlex.split(history_line.command_line)[1:]:
@@ -21,10 +33,6 @@ class UndoableBashCommand(BashCommand, ABC):
             else:
                 params.append(par)
         return flags, params
-
-    @classmethod
-    def undo(cls, history_line: HistoryLine) -> list[BashError]:
-        pass
 
     def __init_subclass__(cls: UndoableBashCommand, **kwargs):
         """Добавляем команды в словарь для автокомплита и вызова команд"""

@@ -5,6 +5,12 @@ from src.terminal.file_system.resolve_path import resolve_path
 
 
 class ShellFormatter(logging.Formatter):
+    """
+    Форматтер логов
+
+    Скрывает 'INFO', добавляет префикс 'ERROR:' для ошибок
+    """
+
     def format(self, record):
         if record.levelno == logging.INFO:
             record.levelname = ""
@@ -14,9 +20,9 @@ class ShellFormatter(logging.Formatter):
 
 
 class Logger:
-
     @classmethod
     def setup_shell_logger(cls):
+        """Инициализация файлового логгера с кастомным форматированием"""
         for handler in logging.root.handlers[:]:
             logging.root.removeHandler(handler)
         logger = logging.getLogger("shell_logger")
@@ -41,6 +47,10 @@ class Logger:
 
 
 def log(output: str | Exception, console_output: bool = True, file_output: bool = True):
+    """Выводит сообщение в консоль и/или лог-файл
+    :param file_output: выводить ли в файл?
+    :param console_output: выводить ли в консоль?
+    """
     console_output and print(output)
     if isinstance(output, Exception):
         file_output and Logger.error(output)

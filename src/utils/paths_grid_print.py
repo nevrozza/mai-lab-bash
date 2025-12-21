@@ -8,6 +8,11 @@ from src.utils.print_builder import PrintBuilder
 
 
 def paths_grid_output(paths: list[pathlib.Path]) -> PrintBuilder:
+    """
+    Форматирует список путей в виде сетки для вывода в терминал
+    :param paths: список путей
+    :return: PrintBuilder
+    """
     builder = PrintBuilder()
     if not paths:
         return builder

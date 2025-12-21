@@ -9,6 +9,8 @@ from src.utils.print_builder import PrintBuilder
 
 
 class GrepBashCommand(BashCommand):
+    """Поиск строк по регулярному выражению в файлах"""
+
     @property
     def _supported_flags(self) -> str:
         return 'ri'
@@ -18,6 +20,7 @@ class GrepBashCommand(BashCommand):
         return 2
 
     def _exec(self) -> tuple[list[BashError], str | None] | None:
+        """Поиск шаблона в указанном файле или директории"""
         print_builder = PrintBuilder()
 
         pattern = self._params[0]
@@ -52,6 +55,7 @@ class GrepBashCommand(BashCommand):
         return errors, print_builder.get()
 
     def _search_in_file(self, file_path: Path, regex: re.Pattern) -> tuple[list[BashError], str]:
+        """Ищет совпадения регулярного выражения по строкам файла"""
         print_builder = PrintBuilder()
         try:
             content = file_path.read_text(encoding='utf-8', errors='ignore')
@@ -68,6 +72,7 @@ class GrepBashCommand(BashCommand):
             return [BashCommandError(name=self.name(), msg=f"Error reading file {file_path}: {str(e)}")], ""
 
     def _validate_params(self):
+        """Проверяет наличие шаблона и корректность пути (при наличии)"""
         if len(self._params) == 0:
             raise BashCommandError(name=self.name(), msg="there is no pattern")
         elif len(self._params) == 1:

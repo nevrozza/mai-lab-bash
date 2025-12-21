@@ -8,12 +8,19 @@ from src.utils.validate_params import default_validate_params
 
 
 class RMBashCommand(UndoableBashCommand):
+    """
+    Команда удаления файлов/директорий с перемещением в ``.trash``
+
+    Поддерживает ``undo``
+    """
+
     @property
     def _supported_flags(self) -> str:
         return "rf"
 
     @classmethod
     def undo(cls, history_line: HistoryLine):
+        """Восстанавливает удалённые файлы из ``.trash`` в исходное расположение"""
         flags, params = cls._parse_history_line(history_line)
         trash_dir = resolve_path(".trash", history_line.wd)
 
@@ -29,19 +36,30 @@ class RMBashCommand(UndoableBashCommand):
             fs.mv(trash_path, original_path)
 
     def _exec(self) -> tuple[list[BashError], str | None] | None:
+        """
+        Выполняет удаление: перемещает файлы/директории в ``.trash``
+
+        Если нет флага ``f`` при удалении директории, потребуется подтверждение
+        """
+
         for path in self._params:
             to_rm = resolve_path(path)
             trash_folder = resolve_path(".trash")
             trash_folder.mkdir(parents=True, exist_ok=True)
             if fs.properties.is_dir(to_rm):
+
+                # Подтверждение удаления директории без флага -f
                 if "f" not in self._flags:
                     answer = input(f"rm dir '{to_rm}'? [y/n] ")
                     if answer != "y":
                         continue
+
                 trash_folder /= to_rm.name
             fs.mv(to_rm, trash_folder)
 
     def _validate_params(self) -> list[BashError]:
+        """Проверяет, что удаляемые пути существуют,
+        не являются текущей/родительской директорией и соответствуют флагам (r for dir)"""
         def validate_path(path: str):
             if not fs.properties.existing_path(path):
                 self._params.remove(path)

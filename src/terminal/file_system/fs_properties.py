@@ -11,9 +11,13 @@ from src.terminal.file_system.utils import PathDetails, get_permission_string
 
 
 class FSProperties:
+    """Утилиты для проверки свойств файлов и директорий"""
+
     @staticmethod
     @resolve_path_deco
     def get_path_details(path: pathlib.Path) -> PathDetails:
+        """:return: Расширенная информация о файле или директории"""
+
         # Windows?
         stat = path.stat()
         blocks = stat.st_blocks
@@ -39,6 +43,8 @@ class FSProperties:
     @staticmethod
     @resolve_path_deco
     def existing_path(path) -> pathlib.Path | None:
+        """Проверяет существование пути
+        :return: Path или None."""
         if path.exists():
             return path
         else:

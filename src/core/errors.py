@@ -1,4 +1,5 @@
 class BashError(Exception):
+    """Класс кастомных ошибок CLI"""
     pass
 
 
@@ -8,10 +9,16 @@ class BashSyntaxError(BashError):
 
 
 class BashNoSupportForLongFlagsError(BashError):
-    pass
+    def __init__(self):
+        super().__init__("there is no support for long flags yet.")
 
 
 class BashCommandError(BashError):
+    """
+    Дефолтная ошибка для команд
+
+    **Пример:** `cd: too many arguments`
+    """
     def __init__(self, name: str, msg: str):
         super().__init__(f"{name}: {msg}")
 

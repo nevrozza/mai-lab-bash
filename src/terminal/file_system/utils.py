@@ -16,6 +16,7 @@ class PathDetails:
 
 
 def get_permission_string(path: pathlib.Path) -> str:
+    """:return: Строка прав доступа (пример: `-rwxr-xr--`)."""
     mode = path.stat().st_mode
     # not fs because of circular import..
     type = "d" if path.is_dir() else "-"

@@ -6,11 +6,14 @@ from src.utils.print_builder import PrintBuilder
 
 
 class HistoryBashCommand(BashCommand):
+    """Выводит историю выполненных команд (можно передать N)"""
+
     @property
     def _max_params_count(self) -> int | None:
         return 1
 
     def _exec(self) -> tuple[list[BashError], str | None] | None:
+        """Формирует вывод истории: номер, метка того, что отменяется (*) и сама команда"""
         print_builder = PrintBuilder()
         start = -int(self._params[0]) if self._params else 0
         history = HistoryManager.history[start:]
@@ -21,6 +24,7 @@ class HistoryBashCommand(BashCommand):
         return [], print_builder.get()
 
     def _validate_params(self) -> list[BashError]:
+        """Проверяет, что параметр (если есть) – это число"""
         if not ((not self._params) or (len(self._params) == 1 and self._params[0].isdigit())):
             raise BashCommandError(name=self.name(), msg="you have to use number for history")
         return []
