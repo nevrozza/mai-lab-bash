@@ -1,0 +1,37 @@
+from src.core.errors import BashError
+from src.terminal.command import UndoableBashCommand
+from src.terminal.file_system.fs import fs
+from src.terminal.file_system.resolve_path import resolve_path
+from src.terminal.history import HistoryLine
+from src.utils.validate_params import cp_mv_validate_params
+
+
+class MVBashCommand(UndoableBashCommand):
+
+    @classmethod
+    def undo(cls, history_line: HistoryLine):
+        flags, params = cls._parse_history_line(history_line)
+
+        if len(params) == 2:
+            src = resolve_path(params[0], history_line.wd)
+            dst = resolve_path(params[1], history_line.wd)
+
+            if fs.properties.is_dir(dst):
+                moved_path = dst / src.name
+            else:
+                moved_path = dst
+            fs.mv(moved_path, src)
+
+        else:
+            dst_dir = resolve_path(params[-1], history_line.wd)
+            for src_param in params[:-1]:
+                src = resolve_path(src_param, history_line.wd)
+                moved_path = dst_dir / src.name
+                fs.mv(moved_path, src)
+
+    def _exec(self) -> str | None:
+        for path in self._params[:-1]:
+            fs.mv(resolve_path(path), resolve_path(self._params[-1]))
+
+    def _validate_params(self) -> list[BashError]:
+        return cp_mv_validate_params(params=self._params, command_name=self.name(), allow_dirs="r" in self._flags)
