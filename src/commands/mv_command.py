@@ -44,4 +44,4 @@ class MVBashCommand(UndoableBashCommand):
             fs.mv(resolve_path(path), resolve_path(self._params[-1]))
 
     def _validate_params(self) -> list[BashError]:
-        return cp_mv_validate_params(params=self._params, command_name=self.name(), allow_dirs="r" in self._flags)
+        return cp_mv_validate_params(params=self._params, command_name=self.name(), allow_dirs=True)

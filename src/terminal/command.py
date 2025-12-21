@@ -41,7 +41,7 @@ class BashCommand(ABC):
 
     def execute(self) -> tuple[list[BashError], tuple[list[BashError], str]]:
         self._flags, self._params = self._parse_raw_params(self.__raw_params)
-        return self._validate_params(), self._exec()
+        return self._validate_params() or [], self._exec() or ([], None)
 
     def _parse_raw_params(self, raw_params: list[str]) -> tuple[set[str], list[str]]:
         flags: set[str] = set()
