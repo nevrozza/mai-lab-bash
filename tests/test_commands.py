@@ -8,12 +8,14 @@ from src.commands.archive.zip_command import ZipBashCommand
 from src.commands.files_content.cat_command import CatBashCommand
 from src.commands.files_content.grep_command import GrepBashCommand
 from src.commands.history.history_command import HistoryBashCommand
+from src.commands.history.undo_command import UndoBashCommand
 from src.commands.navigation.cd_command import CDBashCommand
 from src.commands.navigation.ls_command import LSBashCommand
 from src.commands.undoables.cp_command import CPBashCommand
 from src.commands.undoables.mv_command import MVBashCommand
 from src.commands.undoables.rm_command import RMBashCommand
 from src.terminal.history import HistoryManager
+from src.terminal.terminal import Terminal
 
 
 def test_cd_command(temp_dir):
@@ -207,3 +209,37 @@ def test_history_command(temp_dir):
     assert len(lines) == 2
     assert "элэс" in lines[0]
     assert "cd .." in lines[1]
+
+
+def test_undo_command(temp_dir):
+    rm = temp_dir / "rm"
+    cp = temp_dir / "cp"
+    mv = temp_dir / "mv"
+    other = temp_dir / "other"
+    [d.mkdir() for d in (rm, cp, other, mv)]
+
+    Terminal._execute_commands(
+        [
+            RMBashCommand(["-rf", rm.name], f"rm -rf {rm.name}"),
+            CPBashCommand(["-r", cp.name, other.name], f"cp -r {cp.name} {other.name}"),
+            MVBashCommand([mv.name, other.name], f"mv {mv.name} {other.name}"),
+        ]
+    )
+
+    assert not rm.exists()
+    assert (temp_dir / ".trash" / rm.name).exists()
+    assert not mv.exists()
+    assert (other / mv.name).exists()
+    assert cp.exists()
+    assert (other / cp.name).exists()
+
+    UndoBashCommand([], "").execute()
+    UndoBashCommand([], "").execute()
+    UndoBashCommand([], "").execute()
+
+    assert rm.exists()
+    assert not (temp_dir / ".trash" / rm.name).exists()
+    assert mv.exists()
+    assert not (other / mv.name).exists()
+    assert cp.exists()
+    assert not (other / cp.name).exists()
