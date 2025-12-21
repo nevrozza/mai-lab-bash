@@ -16,23 +16,18 @@ class RMBashCommand(UndoableBashCommand):
     @classmethod
     def undo(cls, history_line: HistoryLine):
         flags, params = cls._parse_history_line(history_line)
+        trash_dir = resolve_path(".trash", history_line.wd)
 
-        # def delete(t_d: pathlib.Path):
-        #     fs.properties.existing_path(t_d) and fs.rm(t_d)
-        #
-        # for path in params[:-1]:
-        #     if not fs.properties.existing_path(path):
-        #         raise BashCommandError(name=cls.name(), msg="can't undo `cp`: original doesn't exist")
-        #
-        # if len(params) == 2:
-        #     to_delete = resolve_path(params[1], history_line.wd)
-        #     to_delete = (to_delete / resolve_path(params[0]).name) if fs.properties.is_dir(to_delete) else to_delete
-        #     delete(to_delete)
-        # else:
-        #     for path in params[:-1]:
-        #         delete_dir = resolve_path(params[-1], history_line.wd)
-        #         to_delete = resolve_path(path, delete_dir)
-        #         delete(to_delete)
+        for param in params:
+            original_path = resolve_path(param, history_line.wd)
+            trash_path = trash_dir / original_path.name
+
+            if not fs.properties.existing_path(trash_path):
+                raise BashCommandError(
+                    name=cls.name(),
+                    msg=f"can't undo `rm`: '{trash_path}' not found in .trash"
+                )
+            fs.mv(trash_path, original_path)
 
     def _exec(self) -> tuple[list[BashError], str | None] | None:
         for path in self._params:

@@ -43,7 +43,7 @@ class Terminal:
             is_error = False
             try:
                 not_critical_validation_errors, (not_critical_exec_errors, output) = command.execute()
-                not_critical_errors = not_critical_validation_errors + not_critical_exec_errors
+                not_critical_errors = (not_critical_validation_errors or []) + (not_critical_exec_errors or [])
                 if not_critical_errors:
                     for error in not_critical_errors:
                         log(error)
