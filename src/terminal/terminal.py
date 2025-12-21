@@ -54,7 +54,7 @@ class Terminal:
                     for error in not_critical_errors:
                         log(error)
                 output and log(output)
-                is_error = not_critical_errors
+                is_error = bool(not_critical_errors)
             except BashError as output:
                 log(output)
                 is_error = True

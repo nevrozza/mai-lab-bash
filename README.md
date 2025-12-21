@@ -15,9 +15,9 @@ Terminal:
 BashCommand(ABC)
 - ls # -l
 - cd # .. #~
-- cat 
+- cat
 - cp # -r
-- mv 
+- mv
 - rm # -r (-f?) y/n ограничения
 - grep
 
@@ -25,5 +25,3 @@ BashCommand(ABC)
 - zip, tar
 - история
 - undo?
-
-

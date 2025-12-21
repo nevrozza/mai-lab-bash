@@ -14,5 +14,5 @@ def get_command_raw_params(command: str) -> tuple[str, list[str]]:
         name = params[0]
         etc = params[1:]
         return name, etc
-    except IndexError, ValueError:
+    except (IndexError, ValueError):
         raise BashSyntaxError

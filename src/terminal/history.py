@@ -26,11 +26,14 @@ class HistoryLine:
 
 class HistoryManager:
     """Управление историей команд: загрузка, сохранение, добавление и `отметка` отмены"""
+    history: list[HistoryLine]
+    _history_path: Path
+    _next_num: int
 
     @classmethod
     def initialize(cls):
         """Инициализирует менеджер: загружает историю из файла или создаёт новый"""
-        cls.history: list[HistoryLine] = []
+        cls.history = []
         cls._history_path = Path(
             BashConfig.HISTORY_FILE_NAME
         ).resolve()  # resolve -> не зависим от cwd, т.к. absolute path

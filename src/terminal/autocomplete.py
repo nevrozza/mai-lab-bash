@@ -1,4 +1,3 @@
-import pathlib
 import shlex
 
 import readline
@@ -13,6 +12,8 @@ class Autocomplete:
 
     # I f****d this API
     # TODO: add support for files started/ended with commas
+
+    _current_suggestions: list[str]
 
     cur_dir = ""
 

@@ -57,8 +57,12 @@ class FSProperties:
             return True
 
         info = os.stat(path)
-        if hasattr(info, "st_file_attributes"):
-            return bool(info.st_file_attributes & stat.FILE_ATTRIBUTE_HIDDEN)  # TODO: check on windows!!
+        if hasattr(info, "st_file_attributes"): # TODO: check on windows!!
+            # getattr because of pre-commit =/
+            info = path.stat()
+            attrs = getattr(info, "st_file_attributes", 0)
+            hidden_flag = getattr(stat, "FILE_ATTRIBUTE_HIDDEN", 0)
+            return bool(attrs & hidden_flag)
         else:
             return False
 

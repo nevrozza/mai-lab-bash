@@ -56,6 +56,7 @@ class RMBashCommand(UndoableBashCommand):
 
                 trash_folder /= to_rm.name
             fs.mv(to_rm, trash_folder)
+        return None
 
     def _validate_params(self) -> list[BashError]:
         """Проверяет, что удаляемые пути существуют,

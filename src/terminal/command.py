@@ -9,7 +9,7 @@ from src.utils.immutable_dict import ImmutableDict
 
 class BashCommand(ABC):
     """Родительский класс для всех команд терминала."""
-    _all_commands: dict[str, BashCommand] = {}
+    _all_commands: dict[str, type[BashCommand]] = {}
 
     def __init__(self, raw_params: list[str], command_line: str):
         self.__raw_params = raw_params
@@ -51,7 +51,7 @@ class BashCommand(ABC):
         """Внутренняя валидация параметров команды"""
         pass
 
-    def execute(self) -> tuple[list[BashError], tuple[list[BashError], str]]:
+    def execute(self) -> tuple[list[BashError], tuple[list[BashError], str | None]]:
         """
         Ручка для запуска команды: парсит параметры, валидирует ``_validate_params`` и запускает команду ``_exec``
 
@@ -67,7 +67,7 @@ class BashCommand(ABC):
         :return: `tuple[set[str], list[str]]` - (мн-во флагов, список параметров)
         """
         flags: set[str] = set()
-        params = []
+        params: list[str] = []
         for par in raw_params:
             if par.startswith("-") and len(par) > 1:
                 if par.startswith("--"):
@@ -87,7 +87,7 @@ class BashCommand(ABC):
         return flags, params
 
     @classmethod
-    def get_all_commands(cls) -> ImmutableDict[str, BashCommand]:
+    def get_all_commands(cls) -> ImmutableDict[str, type[BashCommand]]:
         """
         Возвращает неизменяемый словарь **всех** зарегистрированных команд
 
@@ -96,10 +96,10 @@ class BashCommand(ABC):
         return ImmutableDict(cls._all_commands)
 
     @classmethod
-    def get_command(cls, key: str) -> BashCommand:
+    def get_command(cls, key: str) -> type[BashCommand]:
         return cls._all_commands[key]
 
-    def __init_subclass__(cls: BashCommand, **kwargs):
+    def __init_subclass__(cls, **kwargs):
         """Добавляем команды в словарь для автокомплита и вызова команд"""
 
         # Не добавляем абстракции (UndoableBashCommand, ArchiveBashCommand, UnarchiveBashCommand)

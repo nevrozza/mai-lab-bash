@@ -45,6 +45,7 @@ class CPBashCommand(UndoableBashCommand):
     def _exec(self) -> tuple[list[BashError], str | None] | None:
         for path in self._params[:-1]:
             fs.cp(resolve_path(path), resolve_path(self._params[-1]))
+        return None
 
     def _validate_params(self) -> list[BashError]:
         """Проверяет аргументы с учётом флага ``-r`` для директорий"""

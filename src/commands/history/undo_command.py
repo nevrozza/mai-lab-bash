@@ -20,8 +20,9 @@ class UndoBashCommand(BashCommand):
         else:
             # Ищем последнюю команду, которую можно отменить
             history_line = next((line for line in reversed(HistoryManager.history) if could_be_undo(line)), None)
-
-        return self.__run_undo(history_line), None
+        if history_line:
+            return self.__run_undo(history_line), None
+        return None
 
     def __run_undo(self, history_line: HistoryLine) -> list[BashError]:
         """Вызывает ``undo`` у выбранной команды (из ``history_line``)

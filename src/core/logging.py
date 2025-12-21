@@ -20,12 +20,14 @@ class ShellFormatter(logging.Formatter):
 
 
 class Logger:
+    shell_logger: logging.Logger
+
     @classmethod
     def setup_shell_logger(cls):
         """Инициализация файлового логгера с кастомным форматированием"""
         for handler in logging.root.handlers[:]:
             logging.root.removeHandler(handler)
-        logger = logging.getLogger("shell_logger")
+        logger: logging.Logger = logging.getLogger("shell_logger")
         logger.setLevel(logging.INFO)
 
         file = logging.FileHandler(resolve_path(BashConfig.LOGS_FILE_NAME), mode="w", encoding="utf-8")

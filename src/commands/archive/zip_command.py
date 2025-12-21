@@ -17,6 +17,3 @@ class ZipBashCommand(ArchiveBashCommand):
     @classmethod
     def name(cls) -> str:
         return "zip"
-
-
-

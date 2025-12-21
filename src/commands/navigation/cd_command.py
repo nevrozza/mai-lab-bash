@@ -13,6 +13,7 @@ class CDBashCommand(BashCommand):
     def _exec(self) -> tuple[list[BashError], str | None] | None:
         """Меняет директорию, если указан путь, иначе – скип"""
         len(self._params) == 1 and fs.cd(self._params[0])
+        return None
 
     def _validate_params(self) -> list[BashError]:
         """

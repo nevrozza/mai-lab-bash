@@ -79,11 +79,11 @@ class FS:
             else:
                 return name
 
-        quoted_name = quoted_name()
+        quoted: str = quoted_name()
         if path and fs.properties.is_dir(path):  # Add '/' if it's folder
-            quoted_name += "/"
+            quoted += "/"
 
-        return quoted_name
+        return quoted
 
 
 fs = create_fs()

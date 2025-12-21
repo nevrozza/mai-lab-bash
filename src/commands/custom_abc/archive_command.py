@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from pathlib import Path
 
-from src.core.errors import BashError, BashCommandError, BashNoSuchFileOrDirectoryError, BashNotADirectoryError
+from src.core.errors import BashError, BashNoSuchFileOrDirectoryError, BashNotADirectoryError
 from src.terminal.command import BashCommand
 from src.terminal.file_system.fs import fs
 from src.terminal.file_system.resolve_path import resolve_path

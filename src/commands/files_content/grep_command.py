@@ -1,4 +1,5 @@
 import re
+from collections.abc import Iterator
 from pathlib import Path
 
 from src.core.errors import BashError, BashNoSuchFileOrDirectoryError, BashCommandError
@@ -35,13 +36,14 @@ class GrepBashCommand(BashCommand):
         except re.PatternError:
             raise BashCommandError(name=self.name(), msg=f"Invalid pattern '{pattern}'")
 
+        files_to_search: Iterator[Path]
         if fs.properties.is_dir(path):
             if recursive:
                 files_to_search = path.rglob("*")
             else:
                 files_to_search = path.glob("*")
         else:
-            files_to_search = [path]
+            files_to_search = iter([path])
 
         errors = []
 
