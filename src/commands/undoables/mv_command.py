@@ -40,8 +40,14 @@ class MVBashCommand(UndoableBashCommand):
         return errors
 
     def _exec(self) -> tuple[list[BashError], str | None] | None:
+        errors = []
+        dist_path = resolve_path(self._params[-1])
         for path in self._params[:-1]:
-            fs.mv(resolve_path(path), resolve_path(self._params[-1]))
+            if not fs.properties.existing_path(dist_path):
+                fs.mv(resolve_path(path))
+            else:
+                errors.append(BashCommandError(name=self.name(), msg = f"destination '{dist_path}' already exists"))
+        return errors, ""
 
     def _validate_params(self) -> list[BashError]:
         return cp_mv_validate_params(params=self._params, command_name=self.name(), allow_dirs=True)
