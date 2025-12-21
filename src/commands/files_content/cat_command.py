@@ -8,7 +8,7 @@ from src.utils.print_builder import PrintBuilder
 from src.utils.validate_params import default_validate_params
 
 
-class CATBashCommand(BashCommand):
+class CatBashCommand(BashCommand):
     def _exec(self) -> tuple[list[BashError], str | None] | None:
         print_builder = PrintBuilder()
         for path in self._params:
