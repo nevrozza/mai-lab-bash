@@ -8,6 +8,12 @@ def default_validate_params(
         if_no_params,
         validate_path,
 ) -> list[BashError]:
+    """
+    Общая валидация параметров: вызывает callback'и при отсутствии параметров и проверке каждого пути
+    :param params: параметры
+    :param validate_path: callback(path: str) на каждом параметре
+    :param if_no_params: callback, если нет параметров
+    """
     errors = []
     if not params:
         if_no_params and if_no_params()
@@ -24,6 +30,7 @@ def cp_mv_validate_params(
         command_name: str,
         allow_dirs: bool,
 ):
+    """Валидация параметров для cp/mv с учётом количества аргументов и типа (файл/директория)"""
     if len(params) == 1:
         raise BashMissingDestinationFileOperandError(name=command_name, prev_path=params[0])
     elif len(params) == 0:

@@ -11,9 +11,13 @@ from src.terminal.file_system.utils import PathDetails, get_permission_string
 
 
 class FSProperties:
+    """Утилиты для проверки свойств файлов и директорий"""
+
     @staticmethod
     @resolve_path_deco
     def get_path_details(path: pathlib.Path) -> PathDetails:
+        """:return: Расширенная информация о файле или директории"""
+
         # Windows?
         stat = path.stat()
         blocks = stat.st_blocks
@@ -39,6 +43,8 @@ class FSProperties:
     @staticmethod
     @resolve_path_deco
     def existing_path(path) -> pathlib.Path | None:
+        """Проверяет существование пути
+        :return: Path или None."""
         if path.exists():
             return path
         else:
@@ -51,8 +57,12 @@ class FSProperties:
             return True
 
         info = os.stat(path)
-        if hasattr(info, "st_file_attributes"):
-            return bool(info.st_file_attributes & stat.FILE_ATTRIBUTE_HIDDEN)  # TODO: check on windows!!
+        if hasattr(info, "st_file_attributes"): # TODO: check on windows!!
+            # getattr because of pre-commit =/
+            info = path.stat()
+            attrs = getattr(info, "st_file_attributes", 0)
+            hidden_flag = getattr(stat, "FILE_ATTRIBUTE_HIDDEN", 0)
+            return bool(attrs & hidden_flag)
         else:
             return False
 

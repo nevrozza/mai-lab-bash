@@ -9,7 +9,14 @@ from src.utils.validate_params import default_validate_params
 
 
 class CatBashCommand(BashCommand):
+    """
+    Вывод содержимого одного или нескольких файлов
+
+    Директории игнорируются: выводится предупреждение
+    """
+
     def _exec(self) -> tuple[list[BashError], str | None] | None:
+        """Читает и объединяет содержимое всех указанных файлов"""
         print_builder = PrintBuilder()
         for path in self._params:
             # noinspection PyTypeChecker
@@ -19,9 +26,10 @@ class CatBashCommand(BashCommand):
     @staticmethod
     @resolve_path_deco
     def read_file(path: pathlib.Path) -> str:
-        return path.read_text(encoding="utf-8", errors='ignore')
+        return path.read_text(encoding="utf-8", errors='ignore')  # hm...
 
     def _validate_params(self) -> list[BashError]:
+        """Проверяет, что каждый путь существует и не является директорией"""
         def validate_path(path: str):
             if not fs.properties.existing_path(path):
                 self._params.remove(path)

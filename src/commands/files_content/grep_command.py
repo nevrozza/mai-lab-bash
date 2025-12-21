@@ -1,4 +1,5 @@
 import re
+from collections.abc import Iterator
 from pathlib import Path
 
 from src.core.errors import BashError, BashNoSuchFileOrDirectoryError, BashCommandError
@@ -9,6 +10,8 @@ from src.utils.print_builder import PrintBuilder
 
 
 class GrepBashCommand(BashCommand):
+    """Поиск строк по регулярному выражению в файлах"""
+
     @property
     def _supported_flags(self) -> str:
         return 'ri'
@@ -18,6 +21,7 @@ class GrepBashCommand(BashCommand):
         return 2
 
     def _exec(self) -> tuple[list[BashError], str | None] | None:
+        """Поиск шаблона в указанном файле или директории"""
         print_builder = PrintBuilder()
 
         pattern = self._params[0]
@@ -32,13 +36,14 @@ class GrepBashCommand(BashCommand):
         except re.PatternError:
             raise BashCommandError(name=self.name(), msg=f"Invalid pattern '{pattern}'")
 
+        files_to_search: Iterator[Path]
         if fs.properties.is_dir(path):
             if recursive:
                 files_to_search = path.rglob("*")
             else:
                 files_to_search = path.glob("*")
         else:
-            files_to_search = [path]
+            files_to_search = iter([path])
 
         errors = []
 
@@ -52,6 +57,7 @@ class GrepBashCommand(BashCommand):
         return errors, print_builder.get()
 
     def _search_in_file(self, file_path: Path, regex: re.Pattern) -> tuple[list[BashError], str]:
+        """Ищет совпадения регулярного выражения по строкам файла"""
         print_builder = PrintBuilder()
         try:
             content = file_path.read_text(encoding='utf-8', errors='ignore')
@@ -68,6 +74,7 @@ class GrepBashCommand(BashCommand):
             return [BashCommandError(name=self.name(), msg=f"Error reading file {file_path}: {str(e)}")], ""
 
     def _validate_params(self):
+        """Проверяет наличие шаблона и корректность пути (при наличии)"""
         if len(self._params) == 0:
             raise BashCommandError(name=self.name(), msg="there is no pattern")
         elif len(self._params) == 1:

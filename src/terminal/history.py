@@ -25,9 +25,15 @@ class HistoryLine:
 
 
 class HistoryManager:
+    """Управление историей команд: загрузка, сохранение, добавление и `отметка` отмены"""
+    history: list[HistoryLine]
+    _history_path: Path
+    _next_num: int
+
     @classmethod
     def initialize(cls):
-        cls.history: list[HistoryLine] = []
+        """Инициализирует менеджер: загружает историю из файла или создаёт новый"""
+        cls.history = []
         cls._history_path = Path(
             BashConfig.HISTORY_FILE_NAME
         ).resolve()  # resolve -> не зависим от cwd, т.к. absolute path
@@ -40,11 +46,17 @@ class HistoryManager:
 
     @classmethod
     def _create_history_file(cls):
+        """Создаёт пустой файл истории в формате JSON"""
         cls._history_path.touch()
         cls._history_path.write_text("[]")  # Empty json array
 
     @classmethod
     def _load(cls):
+        """
+        Загружает историю из JSON-файла
+
+        При ошибке: логгирует и создаёт новый файл истории=
+        """
         try:
             with open(cls._history_path, encoding='utf-8') as f:
                 data = json.load(f)
@@ -67,6 +79,11 @@ class HistoryManager:
 
     @classmethod
     def _save(cls):
+        """
+        Сохраняет текущую историю в JSON-файл
+
+        При ошибке логгирует и всё
+        """
         try:
             data = [
                 {
@@ -86,6 +103,7 @@ class HistoryManager:
 
     @classmethod
     def add_command(cls, command_name: str, command_line: str, is_error: bool, wd: str):
+        """Добавляет новую команду в историю и сохраняет файл истории"""
         new_line = HistoryLine(
             num=cls._next_num,
             command_line=command_line,
@@ -99,10 +117,12 @@ class HistoryManager:
 
     @classmethod
     def get_line_by_num(cls, num: int) -> HistoryLine | None:
+        """Возвращает запись по номеру (ищет с конца)"""
         return next((line for line in reversed(cls.history) if line.num == num), None)
 
     @classmethod
     def mark_undo(cls, history_line):
+        """Помечает указанную команду как отменённую (`UNDO`) и сохраняет изменения"""
         for i in range(len(cls.history) - 1, -1, -1):
             if cls.history[i] == history_line:
                 cls.history[i] = replace(history_line, status=HistoryLineStatus.UNDO)

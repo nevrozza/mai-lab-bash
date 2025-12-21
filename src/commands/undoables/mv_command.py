@@ -9,10 +9,15 @@ from src.utils.validate_params import cp_mv_validate_params
 
 
 class MVBashCommand(UndoableBashCommand):
+    """
+    Команда перемещения файлов/директорий
+
+    Поддерживает отмену
+    """
 
     @classmethod
     def undo(cls, history_line: HistoryLine) -> list[BashError]:
-        errors = []
+        errors: list[BashError] = []
         flags, params = cls._parse_history_line(history_line)
 
         def move(path: pathlib.Path, dest: pathlib.Path):
@@ -40,7 +45,8 @@ class MVBashCommand(UndoableBashCommand):
         return errors
 
     def _exec(self) -> tuple[list[BashError], str | None] | None:
-        errors = []
+        """Выполняет перемещение указанных путей в целевую директорию или под новым именем"""
+        errors: list[BashError] = []
         dist_path = resolve_path(self._params[-1])
         for path in self._params[:-1]:
             p1 = resolve_path(path)

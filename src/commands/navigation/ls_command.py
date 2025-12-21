@@ -11,6 +11,12 @@ from src.utils.validate_params import default_validate_params
 
 
 class LSBashCommand(BashCommand):
+    """
+    Команда просмотра содержимого директории
+
+    Поддерживает флаги ``-l`` и ``-a``
+    """
+
     @property
     def _supported_flags(self) -> str:
         return "la"
@@ -26,6 +32,7 @@ class LSBashCommand(BashCommand):
 
     @resolve_path_deco
     def _get_output_items(self, path: pathlib.Path) -> PrintBuilder:
+        """Возвращает отформатированный вывод для одного пути"""
         show_hidden = 'a' in self._flags
         detailed = 'l' in self._flags
         is_dir = fs.properties.is_dir(path)
@@ -38,6 +45,7 @@ class LSBashCommand(BashCommand):
 
     @staticmethod
     def _detailed_output(is_dir: bool, paths: list[pathlib.Path]) -> PrintBuilder:
+        """Формирует подробный вывод (-l)"""
         builder = PrintBuilder()
         total_blocks = 0
         output_details: list[PathDetails] = []
@@ -55,6 +63,12 @@ class LSBashCommand(BashCommand):
         return builder
 
     def _validate_params(self) -> list[BashError]:
+        """
+        Проверяет существование путей
+
+        если параметров нет – использует текущую директорию
+        если в путях ошибка – логгирование и пропуск текущего пути
+        """
         def validate_path(path: str):
             if not fs.properties.existing_path(path):
                 self._params.remove(path)

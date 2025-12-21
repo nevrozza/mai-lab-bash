@@ -3,10 +3,12 @@ repos:
     rev: v1.18.1
     hooks:
       - id: mypy
-        args: [--show-error-codes, --pretty]
+        args: [--show-error-codes, --pretty, --check-untyped-defs]
         additional_dependencies:
           - types-requests
           - types-PyYAML
+          - pytest  # For tests
+          - types-colorama  # Added by me
 
 
 

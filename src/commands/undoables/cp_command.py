@@ -9,17 +9,25 @@ from src.utils.validate_params import cp_mv_validate_params
 
 
 class CPBashCommand(UndoableBashCommand):
+    """
+    Команда копирования файлов/директорий
+
+    Поддерживает копию папок с содержимым и undo
+    """
+
     @property
     def _supported_flags(self) -> str:
         return "r"
 
     @classmethod
     def undo(cls, history_line: HistoryLine):
+        """Отменяет копирование: просто удаляет созданные копии."""
         flags, params = cls._parse_history_line(history_line)
 
         def delete(t_d: pathlib.Path):
             fs.properties.existing_path(t_d) and fs.rm(t_d)
 
+        # Проверка существовния исходных файлов, т.к. иначе отмена бессмысленна (и невозможна в текущей реализации)
         for path in params[:-1]:
             if not fs.properties.existing_path(path):
                 raise BashCommandError(name=cls.name(), msg="can't undo `cp`: original doesn't exist")
@@ -37,6 +45,8 @@ class CPBashCommand(UndoableBashCommand):
     def _exec(self) -> tuple[list[BashError], str | None] | None:
         for path in self._params[:-1]:
             fs.cp(resolve_path(path), resolve_path(self._params[-1]))
+        return None
 
     def _validate_params(self) -> list[BashError]:
+        """Проверяет аргументы с учётом флага ``-r`` для директорий"""
         return cp_mv_validate_params(params=self._params, command_name=self.name(), allow_dirs="r" in self._flags)

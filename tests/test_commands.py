@@ -151,6 +151,7 @@ def test_grep_command(temp_dir):
     file = temp_dir / "test.txt"
     file.write_text("Apple\nbanana")
     _, (_, output) = GrepBashCommand(["Apple", "test.txt"], "").execute()
+    assert output is not None
     assert "test.txt:1 Apple" in output
 
 
@@ -158,6 +159,7 @@ def test_grep_ignore_case(temp_dir):
     file = temp_dir / "test.txt"
     file.write_text("Apple\nbanana")
     _, (_, output) = GrepBashCommand(["apple", "-i", "test.txt"], "").execute()
+    assert output is not None
     assert "test.txt:1 Apple" in output
 
 
@@ -169,12 +171,14 @@ def test_zip_commands(temp_dir):
 
     # zip
     _, (_, out) = ZipBashCommand(["archive_test"], "").execute()
+    assert out is not None
     assert "zip created" in out
     assert (temp_dir / "archive_test.zip").exists()
 
     # unzip
     shutil.rmtree(folder)
     _, (_, out) = UnzipBashCommand(["archive_test.zip"], "").execute()
+    assert out is not None
     assert "unzip" in out
     assert (temp_dir / "archive_test" / "file1.txt").read_text() == "content1"
     assert (temp_dir / "archive_test" / "file2.txt").read_text() == "content2"
@@ -189,6 +193,7 @@ def test_tar_commands(temp_dir):
     # tar
     tar_cmd = TarBashCommand(["tar_test"], "")
     _, (_, out) = tar_cmd.execute()
+    assert out is not None
     assert "tar created" in out
     assert (temp_dir / "tar_test.tar.gz").exists()
 
@@ -196,6 +201,7 @@ def test_tar_commands(temp_dir):
     shutil.rmtree(folder)
     untar_cmd = UntarBashCommand(["tar_test.tar.gz"], "")
     _, (_, out) = untar_cmd.execute()
+    assert out is not None
     assert "untar" in out
     assert (temp_dir / "tar_test" / "doc.txt").read_text() == text
 
@@ -205,6 +211,7 @@ def test_history_command(temp_dir):
     HistoryManager.add_command("cd", "cd ..", is_error=False, wd=str(temp_dir))
 
     _, (_, output) = HistoryBashCommand([], "history").execute()
+    assert output is not None
     lines = output.split("\n")
     assert len(lines) == 2
     assert "элэс" in lines[0]

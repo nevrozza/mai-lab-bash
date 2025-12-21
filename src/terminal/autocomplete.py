@@ -1,4 +1,3 @@
-import pathlib
 import shlex
 
 import readline
@@ -9,14 +8,18 @@ from src.utils.quoting_type import QuotingType
 
 
 class Autocomplete:
-    # TODO: add support for files started/ended with commas
+    """Автодополнение команд и путей при вводе в терминале"""
 
     # I f****d this API
+    # TODO: add support for files started/ended with commas
+
+    _current_suggestions: list[str]
+
     cur_dir = ""
 
     @classmethod
     def enable(cls):
-        # Регистрация `Tab` для автокомплита
+        """Включает автодополнение по нажатию Tab, инициализирует класс"""
         readline.parse_and_bind('tab: complete')
         readline.parse_and_bind('bind ^I rl_complete')  # MacOS...
         readline.set_completer_delims('/ ;')  # По умолчанию там есть другие знаки (!~*...)
@@ -49,6 +52,11 @@ class Autocomplete:
 
     @staticmethod
     def _get_completion_word(line: str) -> tuple[bool, str]:
+        """
+        Определяет, находится ли курсор в позиции команды или аргумента, и возвращает текущее слово для дополнения
+
+        :return: `tuple[bool, str]` – (редачим команду?; слово, которое дополняем)
+        """
         line = line.lstrip()
 
         # parenthesis_stack: list[str] = [] not yet implemented =/
@@ -108,7 +116,7 @@ class Autocomplete:
         """
         !!! Используется для `readline.set_completer` !!!
 
-        :param completion_scope: кусок текста, который мы сейчас дополняем (со стороны автокомплита)
+        :param completion_scope: Кусок текста, который мы сейчас дополняем (со стороны автокомплита)
         :param state: Итерация прохода по suggestions
         :return: Одно из предложений или None
         """
@@ -161,7 +169,8 @@ class Autocomplete:
 
     @classmethod
     def _get_relevant_dir_content(cls, being_completed: str, completion_scope: str,
-                                  quoting_type: QuotingType):
+                                  quoting_type: QuotingType) -> list[str]:
+        """Возвращает список файлов/папок, подходящих под текущий префикс"""
         dir_content = cls._get_current_dir_content(
             being_completed=being_completed, quoting_type=quoting_type)
 
@@ -176,8 +185,7 @@ class Autocomplete:
     @classmethod
     def _get_current_dir_content(cls, being_completed: str,
                                  quoting_type: QuotingType) -> list[str]:
-
-        # print(completion_scope)
+        """Получает содержимое целевой директории (учитывая предыдущий path)"""
         if being_completed and (maybe_dir := shlex.split(being_completed)[-1]) and fs.properties.is_dir(maybe_dir):
             parent = being_completed.split("/")[0:-1]
             if parent:
@@ -189,11 +197,15 @@ class Autocomplete:
         files = fs.ls(directory)
         result = [(cls.cur_dir + fs.normalize_name(p.name, quoting_type=quoting_type, path=p)) for p in
                   files if not fs.properties.is_hidden(path=p)]
-        # print
         return result
 
     @classmethod
     def _cut_normalized_name_for_complete(cls, name: str, being_completed: str, completion_scope: str):
+        """
+        Обрезает имя файла до части, необходимой для вставки после автодополнения
+
+        Workaround с ``кривым`` API
+        """
         length = len(being_completed)
         is_on_gap = len(name) >= length and (name[length + 1] == ' ' or name[length + 1] == ':')
         is_without_quote_but_should = being_completed[0] != "'" and name[0] == "'"
