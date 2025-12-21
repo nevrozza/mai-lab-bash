@@ -1,5 +1,3 @@
-import shlex
-
 from colorama import init, Fore
 
 from src.commands.import_default_commands import import_default_commands
@@ -29,12 +27,16 @@ class Terminal:
 
         print("=== Double `Tab` to show all commands ===")
         while True:
-            input_line = input(
-                f"{Fore.LIGHTGREEN_EX}meow@user{Fore.RESET}:{Fore.LIGHTBLUE_EX}{fs.cwd_str()}{Fore.RESET}$ "
-            )
-            log(f"> {fs.cwd_str()}$ {input_line}", console_output=False)
-            commands = self._parse_commands(input_line)
-            self._execute_commands(commands)
+            try:
+                input_line = input(
+                    f"{Fore.LIGHTGREEN_EX}meow@user{Fore.RESET}:{Fore.LIGHTBLUE_EX}{fs.cwd_str()}{Fore.RESET}$ "
+                )
+                log(f"> {fs.cwd_str()}$ {input_line}", console_output=False)
+                commands = self._parse_commands(input_line)
+                self._execute_commands(commands)
+            except KeyboardInterrupt:
+                print("\nBye!")
+                break
 
     @staticmethod
     def _execute_commands(commands: list[BashCommand]):

@@ -1,5 +1,6 @@
+from src.commands.custom_abc.undoable_command import UndoableBashCommand
 from src.core.errors import BashError, BashCommandError
-from src.terminal.command import BashCommand, UndoableBashCommand
+from src.terminal.command import BashCommand
 from src.terminal.history import HistoryManager, HistoryLine
 from src.utils.could_be_undo import could_be_undo
 
