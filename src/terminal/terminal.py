@@ -58,6 +58,9 @@ class Terminal:
             except BashError as output:
                 log(output)
                 is_error = True
+            except Exception as error:
+                log(error)
+                is_error = True
             finally:
                 HistoryManager.add_command(command_name=command.name(), command_line=command.command_line,
                                            is_error=is_error, wd=cwd)
