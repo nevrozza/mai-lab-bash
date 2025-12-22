@@ -41,11 +41,10 @@ class RMBashCommand(UndoableBashCommand):
 
         Если нет флага ``f`` при удалении директории, потребуется подтверждение
         """
-
+        trash_folder = resolve_path(".trash/")
+        trash_folder.mkdir(exist_ok=True)
         for path in self._params:
             to_rm = resolve_path(path)
-            trash_folder = resolve_path(".trash")
-            trash_folder.mkdir(parents=True, exist_ok=True)
             if fs.properties.is_dir(to_rm):
 
                 # Подтверждение удаления директории без флага -f
@@ -54,13 +53,14 @@ class RMBashCommand(UndoableBashCommand):
                     if answer != "y":
                         continue
 
-                trash_folder /= to_rm.name
-            fs.mv(to_rm, trash_folder)
+            trash_folder /= to_rm.name
+            fs.mv(to_rm, trash_folder, remove_is_exists=True)
         return None
 
     def _validate_params(self) -> list[BashError]:
         """Проверяет, что удаляемые пути существуют,
         не являются текущей/родительской директорией и соответствуют флагам (r for dir)"""
+
         def validate_path(path: str):
             if not fs.properties.existing_path(path):
                 self._params.remove(path)

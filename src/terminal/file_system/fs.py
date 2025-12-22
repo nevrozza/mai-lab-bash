@@ -28,9 +28,10 @@ class FS:
         else:
             shutil.copytree(path, destination / path.name, dirs_exist_ok=True)
 
-    @staticmethod
-    def mv(path: pathlib.Path, destination: pathlib.Path):
+    def mv(self, path: pathlib.Path, destination: pathlib.Path, remove_is_exists: bool = False):
         """Поддерживает файл и директорию"""
+        if remove_is_exists and fs.properties.existing_path(destination):
+            self.rm(destination)
         shutil.move(path, destination)
 
     @resolve_path_deco
