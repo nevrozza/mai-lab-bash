@@ -6,4 +6,4 @@
 - [Ошибка 4 – Сравнение через is вместо ==](./src/commands/navigation/cd_command.py)
 - [Ошибка 5 – Изменение пользовательсĸой ĸоллеĸции во время итерации](./src/commands/navigation/ls_command.py)
 
-[![Видео]](https://github.com/nevrozza/mai-lab-bash/blob/lab5-debugger/docs/bash-debug-unreal-errors.mp4)
+[Видео](https://github.com/nevrozza/mai-lab-bash/blob/lab5-debugger/docs/bash-debug-unreal-errors.mp4)
