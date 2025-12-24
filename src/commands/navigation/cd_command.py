@@ -12,7 +12,14 @@ class CDBashCommand(BashCommand):
 
     def _exec(self) -> tuple[list[BashError], str | None] | None:
         """Меняет директорию, если указан путь, иначе – скип"""
-        len(self._params) == 1 and fs.cd(self._params[0])
+
+        # Ошибка 4
+        # Сравнение через is вместо ==
+        # cd Новая:\ папка:
+        # hex(id((str(len(self._params))))), hex(id("".join("1"))), hex(id((str(len(self._params))))) == hex(id("".join("1")))
+        # id("1") == id(""+"1")
+        if str(len(self._params)) is "".join("1"):
+            fs.cd(self._params[0])
         return None
 
     def _validate_params(self) -> list[BashError]:
@@ -22,7 +29,6 @@ class CDBashCommand(BashCommand):
         Иначе ошибка
         :raise BashNoSuchFileOrDirectoryError, BashNotADirectoryError:
         """
-
 
         if not self._params:
             return []

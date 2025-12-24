@@ -71,6 +71,9 @@ class LSBashCommand(BashCommand):
         """
         def validate_path(path: str):
             if not fs.properties.existing_path(path):
+                # Ошибка 5
+                # Изменение пользовательсĸой ĸоллеĸции во время итерации
+                # ls Новая:\ папка:/ tx1x packman Курсовик.docx
                 self._params.remove(path)
                 return BashNoSuchFileOrDirectoryError(name=self.name(),
                                                       filename=path)

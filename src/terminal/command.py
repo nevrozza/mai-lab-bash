@@ -74,7 +74,10 @@ class BashCommand(ABC):
                     raise BashNoSupportForLongFlagsError
                 for f in par[1:]:
                     if f not in self._supported_flags:
-                        if not BashConfig.IGNORE_EXTRA_FLAGS:
+                        # Ошибка 3
+                        # Неверное логичесĸое условие
+                        # ls титульник.pdf -r
+                        if BashConfig.IGNORE_EXTRA_FLAGS:
                             raise BashInvalidFlagError(name=self.name(), flag=f, supported=self._supported_flags)
                     else:
                         flags.add(f)

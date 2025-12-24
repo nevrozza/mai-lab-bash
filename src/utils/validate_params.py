@@ -18,10 +18,11 @@ def default_validate_params(
     if not params:
         if_no_params and if_no_params()
     else:
-        for path in params[:]:
+        for path in params:
             possible_error = validate_path(path)
             if isinstance(possible_error, BashError):
                 errors.append(possible_error)
+    print(params)
     return errors
 
 
@@ -52,6 +53,10 @@ def cp_mv_validate_params(
                 raise BashNotADirectoryError(name=command_name, filename=path)
         path_index += 1
 
-    for pathx in params:
+    # Ошибка 1
+    # Ошибĸа границы циĸла (off-by-one)
+    # mv Новая:\ папка:.zip terminal_shit1/
+    for i in range(len(params)+1):
+        pathx = params[i]
         validate_path(pathx)
     return []

@@ -59,7 +59,10 @@ class Terminal:
                 log(output)
                 is_error = True
             except Exception as error:
-                log(error)
+                # Ошибка 2
+                # Перехват слишĸом общего исĸлючения
+                # mv Новая:\ папка:.zip terminal_shit1/
+                log("Не удалось пингануть 'ya.ru'")
                 is_error = True
             finally:
                 HistoryManager.add_command(command_name=command.name(), command_line=command.command_line,
